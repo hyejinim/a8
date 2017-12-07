@@ -7,7 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <script src="Player.js"></script>
-  <script src="Gun.js"></script>
   <script src="Shape.js"></script>
   <script src="Cloud.js"></script>
   <script src="Button.js"></script>
@@ -88,6 +87,13 @@
                   '#00a2ff'];
 
     <!-- onload Function -->
+    window.onkeydown = function(e) {
+      if (e.keyCode == 32 && e.target == document.body) {
+        e.preventDefault();
+        player.setJumped(true);
+      }
+    };
+
     window.onload = function() {
       // Set up canvas
       c = document.getElementById("MyCanvas");
@@ -104,9 +110,11 @@
       });
       c.focus();
 
-     // Create Player and Gun
+      // Create Player
       player = new Player();
-      gun = new Gun();
+
+      // Create Shapes
+      // createShape(20);
 
       // Create clouds
       for (var i=0; i<10; i++) {
@@ -114,7 +122,7 @@
         clouds.push(cloud);
       }
 
-      // Draw all
+      // Draw background, Player
       drawAll();
 
       // Add buttons
@@ -129,7 +137,7 @@
       var grd=gc.createLinearGradient(0,75,0,750);
       grd.addColorStop(0,"#FFAFBD");
       grd.addColorStop(1,"#ffc3a0");
-      gc.fillStyle = grd; //#43C6AC #FFAFBD #d3d3d3 #FFEB3B grd
+      gc.fillStyle = "#FFEB3B"; //#43C6AC #FFAFBD #d3d3d3 grd
       gc.fillRect(0, 0, c.width, c.height);
     }
 
@@ -180,19 +188,13 @@
       // Background
       drawBackground();
 
+      // Player
+      player.draw(gc);
+
       // Clouds
       for (var i=0; i<clouds.length; i++) {
         var cloud = this.clouds[i];
         cloud.draw(gc);
-      }
-
-      // Player
-      player.draw(gc);
-
-      // Gun
-      for (var i=0; i<shooting.length; i++) {
-        var shot = this.shooting[i];
-        shot.draw(gc);
       }
 
       // Shape
@@ -207,12 +209,6 @@
 
       // Player
       player.tick();
-
-      // Gun
-      for (var i=0; i<shooting.length; i++) {
-        var shot = this.shooting[i];
-        shot.tick(gc);
-      }
 
       // Clouds
       for (var i=0; i< clouds.length; i++) {
@@ -636,6 +632,5 @@ function doit (string) {
   <p><b>Status: </b></b><span id="statusmsg">(Nothing Here)</span></p>
   <p><b>Animal Count: </b></b><span id="count">0</span></p>
   <p><b>Selected Animal: </b></b><span id="selected" style="font-size:60px;"></span></p>
-  </body>
   </body>
 </html>
