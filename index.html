@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <script src="Player.js"></script>
+  <script src="Gun.js"></script>
   <script src="Shape.js"></script>
   <script src="Cloud.js"></script>
   <script src="Button.js"></script>
@@ -15,7 +16,7 @@
 
     <meta charset="utf-8">
     <meta content="initial-scale=1, minimum-scale=1, width=device-width" name="viewport">
-    <title>Speech recognition demo</title>
+    <title>Assignment 8</title>
 
     <style>
     #info {
@@ -75,6 +76,8 @@
     var waitingShapes = [];
     var runningShapes = [];
     var player;
+    var gun;
+    var shooting = [];
     var clouds = [];
 
     // Shape colors
@@ -88,11 +91,18 @@
 
     <!-- onload Function -->
     window.onkeydown = function(e) {
-      if (e.keyCode == 32 && e.target == document.body) {
+      if (e.keyCode == 32 || e.keyCode == 38 && e.target == document.body) {
         e.preventDefault();
         player.setJumped(true);
       }
-    };
+      else if (e.keyCode == 39 && e.target == document.body) {
+        e.preventDefault();
+        shooting.push(gun);
+        // hit = true;
+        gun.doShot(true);
+        console.log('call doShot');
+      }
+    }
 
     window.onload = function() {
       // Set up canvas
@@ -101,20 +111,9 @@
       c.width = window.innerWidth;
       c.height = window.innerHeight-100;
 
-      // Key event listener
-      c.addEventListener('keydown', function(event) {
-          if(event.keyCode == 32) {
-              player.setJumped(true);
-          }
-          console.log("press the space bar");
-      });
-      c.focus();
-
       // Create Player
       player = new Player();
-
-      // Create Shapes
-      // createShape(20);
+      gun = new Gun();
 
       // Create clouds
       for (var i=0; i<10; i++) {
@@ -137,7 +136,7 @@
       var grd=gc.createLinearGradient(0,75,0,750);
       grd.addColorStop(0,"#FFAFBD");
       grd.addColorStop(1,"#ffc3a0");
-      gc.fillStyle = "#FFEB3B"; //#43C6AC #FFAFBD #d3d3d3 grd
+      gc.fillStyle = grd; //#43C6AC #FFAFBD #d3d3d3 #FFEB3B grd
       gc.fillRect(0, 0, c.width, c.height);
     }
 
@@ -188,13 +187,19 @@
       // Background
       drawBackground();
 
-      // Player
-      player.draw(gc);
-
       // Clouds
       for (var i=0; i<clouds.length; i++) {
         var cloud = this.clouds[i];
         cloud.draw(gc);
+      }
+
+      // Player
+      player.draw(gc);
+
+      // Gun
+      for (var i=0; i<shooting.length; i++) {
+        var shot = this.shooting[i];
+        shot.draw(gc);
       }
 
       // Shape
@@ -209,6 +214,12 @@
 
       // Player
       player.tick();
+
+      // Gun
+      for (var i=0; i<shooting.length; i++) {
+        var shot = this.shooting[i];
+        shot.tick(gc);
+      }
 
       // Clouds
       for (var i=0; i< clouds.length; i++) {
@@ -433,23 +444,23 @@ var final_transcript = '';
 var recognizing = false;
 var ignore_onend;
 var start_timestamp;
-if (!('webkitSpeechRecognition' in window)) { 
-  upgrade(); 
+if (!('webkitSpeechRecognition' in window)) {
+  upgrade();
 } else {
   start_button.style.display = 'inline-block';
-  var recognition = new webkitSpeechRecognition(); 
-  recognition.continuous = false; 
-  recognition.interimResults = true; 
+  var recognition = new webkitSpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = true;
 
-  recognition.onstart = function() { 
-    recognizing = true; 
-    showInfo('info_speak_now'); 
+  recognition.onstart = function() {
+    recognizing = true;
+    showInfo('info_speak_now');
   };
 
   // Things that can go wrong
-  recognition.onerror = function(event) { 
-    if (event.error == 'no-speech') { 
-      showInfo('info_no_speech'); 
+  recognition.onerror = function(event) {
+    if (event.error == 'no-speech') {
+      showInfo('info_no_speech');
       ignore_onend = true;
     }
     if (event.error == 'audio-capture') {
@@ -466,7 +477,7 @@ if (!('webkitSpeechRecognition' in window)) {
     }
   };
 
-  recognition.onend = function() { 
+  recognition.onend = function() {
     recognizing = false;
     if (ignore_onend) {
       return;
@@ -484,10 +495,10 @@ if (!('webkitSpeechRecognition' in window)) {
     }
 
     // Display or otherwise utilize result
-    doit (final_transcript); 
+    doit (final_transcript);
   };
 
-  recognition.onresult = function(event) { 
+  recognition.onresult = function(event) {
     var interim_transcript = '';
     if (typeof(event.results) == 'undefined') {
       recognition.onend = null;
@@ -497,18 +508,18 @@ if (!('webkitSpeechRecognition' in window)) {
     }
 
     // event.results is an array of the recognized strings
-    for (var i = event.resultIndex; i < event.results.length; ++i) { 
-      if (event.results[i].isFinal) { 
-        final_transcript += event.results[i][0].transcript; 
-      } else { 
-        interim_transcript += event.results[i][0].transcript; 
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        final_transcript += event.results[i][0].transcript;
+      } else {
+        interim_transcript += event.results[i][0].transcript;
       }
       if(interim_transcript.includes("whatwhat")){
         alert("whatwhat");
       }
     }
 
-    final_span.innerHTML = linebreak(final_transcript); 
+    final_span.innerHTML = linebreak(final_transcript);
     interim_span.innerHTML = linebreak(interim_transcript);
   };
 }
@@ -567,12 +578,12 @@ function showInfo(s) {
  */
 
 // "Roy G Biv" colors only
-var colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"] 
+var colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"]
 
 // Limited set of shapes
 var shapes = ["square", "rectangle", "circle", "ellipse"]
 
-function doit (string) { 
+function doit (string) {
 	/*
 	 * Example of something you could do with the recognized text
 	 */
@@ -580,44 +591,44 @@ function doit (string) {
 	string = string.toLowerCase()
 
 	// Search for a color, else we choose black
-	var color = colors.filter ( 
-		function (c) { 
-			return string.match (new RegExp ("\\b" + c + "\\b")) 
-		}) [0] 
+	var color = colors.filter (
+		function (c) {
+			return string.match (new RegExp ("\\b" + c + "\\b"))
+		}) [0]
 
 	// Search for a shape, else we don't draw
-	var shape = shapes.filter ( 
-		function (s) { 
-			return string.match (new RegExp ("\\b" + s + "\\b")) 
-		}) [0] 
+	var shape = shapes.filter (
+		function (s) {
+			return string.match (new RegExp ("\\b" + s + "\\b"))
+		}) [0]
 
 	// If found a shape, draw it
-	if (shape) { 
+	if (shape) {
 		var canvas = document.getElementById ("MyCanvas");
 		var gc = canvas.getContext ("2d")
-		gc.fillStyle = color? color: "black" 
-		
+		gc.fillStyle = color? color: "black"
+
 		// Generate some random coordinates
 		var x = 50 + Math.floor (400 * Math.random ())
 		var y = 50 + Math.floor (400 * Math.random ())
 		var w = 20 + Math.floor (100 * Math.random ())
 		var h = 20 + Math.floor (100 * Math.random ())
 
-		if (shape=="square") { 
-			gc.fillRect (x, y, w, w) 
+		if (shape=="square") {
+			gc.fillRect (x, y, w, w)
 		}
-		else if (shape=="rectangle") { 
-			gc.fillRect (x, y, w, h) 
+		else if (shape=="rectangle") {
+			gc.fillRect (x, y, w, h)
 		}
-		else if (shape=="circle") { 
-			gc.beginPath(); 
-			gc.arc (x, y, w/2, 0, Math.PI * 2); 
-			gc.fill(); 
+		else if (shape=="circle") {
+			gc.beginPath();
+			gc.arc (x, y, w/2, 0, Math.PI * 2);
+			gc.fill();
 		}
-		else if (shape=="ellipse") { 
-			gc.beginPath(); 
-			gc.ellipse (x, y, w/2, h/2, 0, 0, Math.PI * 2); 
-			gc.fill(); 
+		else if (shape=="ellipse") {
+			gc.beginPath();
+			gc.ellipse (x, y, w/2, h/2, 0, 0, Math.PI * 2);
+			gc.fill();
 		}
 	}
 
