@@ -1,14 +1,14 @@
 class Player {
 
   constructor() {
-    this.emoji = '🐵'; //😈👶🙅🙆🤦‍🙋‍
-    this.size = 70;
+    // this.emoji = '🐵'; //😈👶🙅🙆🤦‍🙋‍
+    // this.size = 70;
     this.x = c.width * 1/7;
-    this.y = (c.height-15) * 2.3/4;
+    this.y = c.height * 3/5;
     this.moved = false;
     this.jumped = false;
     this.image = new Image();
-    this.image.src = 'images/monkey_run_1.png';
+    this.image.src = 'images/bean-run1.png';
 
 
     // this.runStart = new Image();
@@ -35,10 +35,14 @@ class Player {
     let y = this.y;
     let image = this.image;
 
+    if (!gameStart) {
+      this.image.src = 'images/bean-run3.png';
+    }
+
     image.onload = function(){
       context.drawImage(image, x, y);
     }
-    console.log("draw player");
+    // console.log("draw player" + image);
   }
   setPosition(x, y) {
     this.x = x;
@@ -47,34 +51,36 @@ class Player {
   setJumped(jumped) {
     this.jumped = jumped;
   }
+  // isInside(point) {
+  //   var rect = new Rectangle((int) this.x,(int)  this.y, this.icon.getIconWidth(), this.icon.getIconHeight());
+  //   return rect.contains(p);
+  // }
+  // bound() {
+  //   var rect;
+  //   gc.rect(this.x, this.y, this.width, this.height);
+  //   console.log(rect);
+  // }
   tick() {
     if (!this.moved) {
-      // this.emoji = '🙉';
-      // this.x = c.width * 1/7 - 30;
-
-      this.image.src = 'images/monkey_run_2.png';
+      this.image.src = 'images/bean-run3.png';
       this.moved = true;
-      console.log("draw run 2")
+      // console.log("draw run 2")
     } else if (this.moved) {
-      // this.emoji = '🐵';
-      // this.x = c.width * 1/7;
-
-      this.image.src = 'images/monkey_run_1.png';
+      this.image.src = 'images/bean-run4.png';
       this.moved = false;
     }
     if (this.jumped) {
       // Jumping animation
-      if (this.y = (c.height-15) * 2.3/4) {
-        this.image.src = 'images/monkey_jump_2.png';
+      if (this.y = c.height * 2.7/5) {
+        this.image.src = 'images/bean-run4.png';
         this.y = this.y - 300;
-        console.log("player position: ", this.y);
       }
       this.jumped = false;
     } else {
-      if (this.y < (c.height-15) * 2.3/4) {
-        this.y = this.y + 20;
-        console.log("player position: ", this.y);
-        this.image.src = 'images/monkey_jump_2.png';
+      if (this.y < c.height * 2.7/5) {
+        this.y = this.y + 10;
+        // console.log("player position: ", this.y);
+        this.image.src = 'images/bean-run4.png';
       }
     }
   }

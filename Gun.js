@@ -1,12 +1,12 @@
 class Gun {
 
-  constructor() {
-    this.type = 'Rectangle -->';
+  constructor(player, type) {
+    this.type = type + " ▶";
     this.size = 25;
-    this.x = c.width * 1.5/7;
-    this.y = (c.height-15) * 3/4;
-    this.shot = false;
-    this.hit = false;
+    this.x = player.x;
+    this.y = player.y + 100;
+    this.shooting = false;
+    // this.hit = false;
   }
   draw(context) {
     context.fillStyle = "#000000";
@@ -19,15 +19,15 @@ class Gun {
     this.x = x;
     this.y = y;
   }
-  doShot(isShot) {
-    this.shot = isShot;
+  setShooting(isShot) {
+    this.shooting = isShot;
     // this.hit = true;
-    console.log('shot doShot' + this.hit);
+    // console.log();
   }
   tick() {
-    if (this.shot) {
+    if (this.shooting) {
       // if (!this.hit) {
-        this.x += 10;
+        this.x += 20;
         console.log('shot tick')
         // this.shot = false;
       }

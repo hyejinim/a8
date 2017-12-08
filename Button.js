@@ -17,12 +17,14 @@ class Button {
       "'" + this.button.value + "'" + " button" + " was pushed";
 
     if (label == "Start") {
+      gameStart = true;
+      setInterval(launchShape, 2000); // launch a new object every 3000 msec
       tick();
-      setInterval(launchShape, 3000); // launch a new object every 4000ms
-      console.log("call setInterval");
       this.button.blur();
     } else if (label == "Stop") {
-      player.setJumped(true);
+      // player.bound();
+      gameStart = false;
+      // setInterval(launchShape, 0);
     }
   }
 }
