@@ -1,93 +1,45 @@
 <!DOCTYPE html>
-<html>
-  <head>
 
-<link rel="stylesheet" href="style.css">
+<html>
+
+<head>
+  <title>Assignment 8</title>
+
+  <link rel="stylesheet" href="style.css">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <script src="Ground.js"></script>
+  <script src="Cloud.js"></script>
   <script src="Player.js"></script>
   <script src="Gun.js"></script>
   <script src="Shape.js"></script>
-  <script src="Cloud.js"></script>
   <script src="Button.js"></script>
   <script src="utils.js"></script>
 
-
-    <meta charset="utf-8">
-    <meta content="initial-scale=1, minimum-scale=1, width=device-width" name="viewport">
-    <title>Assignment 8</title>
-
-    <style>
-    #info {
-    font-size: 20px;
-    }
-    #div_start {
-    float: right;
-    }
-    #headline {
-    text-decoration: none
-    }
-    #results {
-    font-size: 14px;
-    font-weight: bold;
-    border: 1px solid #ddd;
-    padding: 15px;
-    text-align: left;
-    min-height: 150px;
-    }
-    #start_button {
-    border: 0;
-    background-color:transparent;
-    padding: 0;
-    }
-    .interim {
-    color: gray;
-    }
-    .final {
-    color: black;
-    padding-right: 3px;
-    }
-    .marquee {
-    margin: 20px auto;
-    }
-
-    #buttons {
-    margin: 10px 0;
-    position: relative;
-    top: -50px;
-    }
-
-    #copy {
-    margin-top: 20px;
-    }
-
-    #copy > div {
-    display: none;
-    margin: 0 70px;
-    }
-    </style>
-
-    <script type="text/javascript">
+  <script type="text/javascript">
 
     // Globals variables
     var c, gc;
     var frame = 0;
+    var shapeType = [];
     var waitingShapes = [];
     var runningShapes = [];
     var player;
-    var gun;
-    var shooting = [];
+    // var gun;
+    var ground;
+    // var hit;
+    var shootingShots = [];
     var clouds = [];
+    var gameStart;
 
     // Shape colors
     var colors = ['#FFFF8D',
-                  '#dff69e',
-                  '#00ceff',
-                  '#ee78aa',
-                  '#3f159f',
-                  '#71b583',
-                  '#00a2ff'];
+    							'#dff69e',
+              		'#00ceff',
+    							'#ee78aa',
+              		'#3f159f',
+              		'#71b583',
+              		'#00a2ff'];
 
     <!-- onload Function -->
     window.onkeydown = function(e) {
@@ -95,12 +47,60 @@
         e.preventDefault();
         player.setJumped(true);
       }
-      else if (e.keyCode == 39 && e.target == document.body) {
+      else if (e.keyCode == 39 || e.keyCode == 65 && e.target == document.body) {
         e.preventDefault();
-        shooting.push(gun);
-        // hit = true;
-        gun.doShot(true);
-        console.log('call doShot');
+
+        let type = "circle"; // test input
+        shootAShot(type);
+        // console.log('Shoot a shot');
+      }
+      else if (e.keyCode == 83 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "rectangle"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 68 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "triangle"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 70 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "square"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 70 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "rhombus"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 81 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "parallelogram"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 87 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "parallelogram"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 69 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "pentagon"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 82 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "hexagon"; // test input
+        shootAShot(type);
       }
     }
 
@@ -111,15 +111,30 @@
       c.width = window.innerWidth;
       c.height = window.innerHeight-100;
 
-      // Create Player
+      // Key event listener
+      // c.addEventListener('keydown', function(event) {
+      //     if(event.keyCode == 32) {
+      //         player.setJumped(true);
+      //     }
+      //     console.log("press the space bar");
+      // });
+      // c.focus();
+
+      gameStart = false;
+      // Create Player and Gun
       player = new Player();
-      gun = new Gun();
+      // hit = false;
+      // gun = new Gun(player, "Circle");
+
+      // Create Shapes
+      // createShape(20);
 
       // Create clouds
-      for (var i=0; i<10; i++) {
+      for (var i=0; i<5; i++) {
         var cloud = new Cloud();
         clouds.push(cloud);
       }
+      ground = new Ground();
 
       // Draw background, Player
       drawAll();
@@ -133,72 +148,68 @@
 
     <!-- Function -->
     function drawBackground() {
+      // Draw background color
       var grd=gc.createLinearGradient(0,75,0,750);
       grd.addColorStop(0,"#FFAFBD");
       grd.addColorStop(1,"#ffc3a0");
-      gc.fillStyle = grd; //#43C6AC #FFAFBD #d3d3d3 #FFEB3B grd
+      gc.fillStyle = "#EEEEEE"; //#43C6AC #FFAFBD #d3d3d3 #FFEB3B grd
       gc.fillRect(0, 0, c.width, c.height);
+
+      // Draw ground images
+      // let x = 0;
+      // let y = c.height/9;
+      // let image = 'images/ground1.png';
+      // window.onload = function(){
+      //   context.drawImage(image, x, y);
+      // }
+      // console.log("draw ground image");
     }
 
     // Make new shape items and put them in waitingShapes array list
-    function createShape(int) {
-      console.log("call create shape");
-      // Make an arrayList for containing all types of shapes
-      var shapeType = [];
-      shapeType.push("circle", "rectangle"); //"square", "ellipse", "triangle"
-
-      // Get a random type of shape
-      var randomShape = shapeType[Math.floor(Math.random() * shapeType.length)];
-
-      for (var i=0; i<int; i++) {
-        var shp;
-
-        if (randomShape == "circle") {
-          shp = new Circle();
-        } else if (randomShape == "rectangle") {
-          shp = new Rectangle();
-        }
-        // Put the initialized item in the arrayList
-        waitingShapes.push(shp);
-        console.log(i + " create shape")
-      }
-    }
-
-    function launchShape() {
-      console.log("call launch shape");
-      // Make an arrayList for containing all types of shapes
-      var shapeType = [];
-      shapeType.push("circle", "rectangle"); //"square", "ellipse", "triangle"
-
-      // Get a random type of shape
-      var randomShape = shapeType[Math.floor(Math.random() * shapeType.length)];
-      var shp;
-
-      if (randomShape == "circle") {
-        shp = new Circle();
-      } else if (randomShape == "rectangle") {
-        shp = new Rectangle();
-      }
-      // Put the initialized item in the arrayList
-      runningShapes.push(shp);
-    }
+    // function createShape(int) {
+    //   console.log("call create shape");
+    //   // Make an arrayList for containing all types of shapes
+    //   var shapeType = [];
+    //   shapeType.push("circle", "rectangle"); //"square", "ellipse", "triangle"
+    //
+    //   // Get a random type of shape
+    //   var randomShape = shapeType[Math.floor(Math.random() * shapeType.length)];
+    //
+    //   for (var i=0; i<int; i++) {
+    //     var shp;
+    //
+    //     if (randomShape == "circle") {
+    //       shp = new Circle();
+    //     } else if (randomShape == "rectangle") {
+    //       shp = new Rectangle();
+    //     }
+    //     // Put the initialized item in the arrayList
+    //     waitingShapes.push(shp);
+    //     console.log(i + " create shape")
+    //   }
+    // }
 
     function drawAll() {
+      gc.clearRect(0, 0, c.width, c.height);
       // Background
       drawBackground();
+
+      // Ground
+      ground.draw(gc);
 
       // Clouds
       for (var i=0; i<clouds.length; i++) {
         var cloud = this.clouds[i];
         cloud.draw(gc);
+        // console.log("draw cloud");
       }
 
       // Player
       player.draw(gc);
 
       // Gun
-      for (var i=0; i<shooting.length; i++) {
-        var shot = this.shooting[i];
+      for (var i=0; i<shootingShots.length; i++) {
+        var shot = this.shootingShots[i];
         shot.draw(gc);
       }
 
@@ -210,438 +221,215 @@
     }
 
     function tick() {
-      frame ++;
 
-      // Player
-      player.tick();
+      if (gameStart) {
+        frame ++;
 
-      // Gun
-      for (var i=0; i<shooting.length; i++) {
-        var shot = this.shooting[i];
-        shot.tick(gc);
+        // Clouds
+        for (var i=0; i< clouds.length; i++) {
+          var cloud = this.clouds[i];
+          cloud.tick();
+        }
+
+        // Ground
+        ground.tick();
+
+        // Player
+        player.tick();
+
+        // Gun
+        for (var i=0; i<shootingShots.length; i++) {
+          var shot = this.shootingShots[i];
+          shot.tick(gc);
+        }
+
+        // Shapes
+        for (var i=0; i< runningShapes.length; i++) {
+          var shape = this.runningShapes[i];
+          shape.tick();
+        }
+
+        // Check collision between player and shapes
+        for (var i=0; i< runningShapes.length; i++) {
+          var shape = this.runningShapes[i];
+          console.log("collision check");
+          if (isCollided(player, shape)) {
+            console.log("damaged");
+            // player.decreaseSize
+          }
+          // for (var i=0; i< shootingShots.length; i++) { // shots and shapes
+          //   var shot = this.shootingShots[i];
+          //   if (collided(shape, shot)) {
+          //     shootingShots.remove(shot);
+          //     runningShapes.remove(shape);
+          //     console.log("good job!");
+          //   }
+          // }
+        }
+
+        setTimeout(tick, 100); // tick every 100 msec
       }
 
-      // Clouds
-      for (var i=0; i< clouds.length; i++) {
-        var cloud = this.clouds[i];
-        cloud.tick();
-      }
 
-      // Shapes
-      for (var i=0; i< runningShapes.length; i++) {
-        var shape = this.runningShapes[i];
-        shape.tick();
-      }
 
       // Redraw all with updated data
       drawAll();
-      setTimeout(tick, 100); // 100 msec
     }
-      </script>
-    /////////////////////////
-  </head>
 
-  <body>
-    <div class="browser-landing" id="main">
-      <div class="compact marquee-stacked" id="marquee">
-        <div class="marquee-copy">
-          <h1>
-            <a href="http://dvcs.w3.org/hg/speech-api/raw-file/tip/speechapi.html">Web Speech API</a> Demonstration
-          </h1>
-        </div>
-      </div>
+    function launchShape() {
+      // Containing all types of shapes
+      shapeType.push("circle", "rectangle"); //"square", "ellipse", "triangle"
 
-      <div class="compact marquee">
-        <div id="info">
-          <p id="info_start">
-            Click on the Start/stop button and begin speaking.
-          </p>
-          <p id="info_speak_now" style="display:none">
-            Speak now.
-          </p>
-          <p id="info_no_speech" style="display:none">
-            No speech was detected. You may need to adjust your <a href=
-            "//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">microphone
-            settings</a>.
-          </p>
-          <p id="info_no_microphone" style="display:none">
-            No microphone was found. Ensure that a microphone is installed and that
-            <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">
-            microphone settings</a> are configured correctly.
-          </p>
-          <p id="info_allow" style="display:none">
-            Click the "Allow" button above to enable your microphone.
-          </p>
-          <p id="info_denied" style="display:none">
-            Permission to use microphone was denied.
-          </p>
-          <p id="info_blocked" style="display:none">
-            Permission to use microphone is blocked. To change, go to
-            chrome://settings/contentExceptions#media-stream
-          </p>
-          <p id="info_upgrade" style="display:none">
-            Web Speech API is not supported by this browser. Use <a href=
-            "//www.google.com/chrome">Chrome</a> version 25 or later.
-          </p>
-        </div>
-        <div id="div_start">
-          <button id="start_button" onclick="startButton(event)">Start/stop</button>
-        </div>
-        <div id="results">
-          <span class="final" id="final_span"></span> <span class="interim" id=
-          "interim_span"></span>
-        </div>
-        <div class="compact marquee" id="div_language">
-          <select id="select_language" onchange="updateCountry()">
-            </select>&nbsp;&nbsp; <select id="select_dialect">
-            </select>
-        </div>
-      </div>
-    </div>
-    <canvas id="MyCanvas" style="border: solid"></canvas>
+      // Get a random type of shape
+      var randomShape = shapeType[Math.floor(Math.random() * shapeType.length)];
+      var shp;
+      console.log("launch " ,shp);
 
-<script>
-"use strict";
-
-/*
- * Simple program to demo speech recognition
- *
- * Based on https://www.google.com/intl/en/chrome/demos/speech.html
- *
- * Must run on a remote server, and access via https not http.
- * Works on only Chrome
- */
-
-/*
- * Choose your language
- */
-var langs =
-[['Afrikaans',       ['af-ZA']],
- ['አማርኛ',           ['am-ET']],
- ['Azərbaycanca',    ['az-AZ']],
- ['বাংলা',            ['bn-BD', 'বাংলাদেশ'],
-                     ['bn-IN', 'ভারত']],
- ['Bahasa Indonesia',['id-ID']],
- ['Bahasa Melayu',   ['ms-MY']],
- ['Català',          ['ca-ES']],
- ['Čeština',         ['cs-CZ']],
- ['Dansk',           ['da-DK']],
- ['Deutsch',         ['de-DE']],
- ['English',         ['en-AU', 'Australia'],
-                     ['en-CA', 'Canada'],
-                     ['en-IN', 'India'],
-                     ['en-KE', 'Kenya'],
-                     ['en-TZ', 'Tanzania'],
-                     ['en-GH', 'Ghana'],
-                     ['en-NZ', 'New Zealand'],
-                     ['en-NG', 'Nigeria'],
-                     ['en-ZA', 'South Africa'],
-                     ['en-PH', 'Philippines'],
-                     ['en-GB', 'United Kingdom'],
-                     ['en-US', 'United States']],
- ['Español',         ['es-AR', 'Argentina'],
-                     ['es-BO', 'Bolivia'],
-                     ['es-CL', 'Chile'],
-                     ['es-CO', 'Colombia'],
-                     ['es-CR', 'Costa Rica'],
-                     ['es-EC', 'Ecuador'],
-                     ['es-SV', 'El Salvador'],
-                     ['es-ES', 'España'],
-                     ['es-US', 'Estados Unidos'],
-                     ['es-GT', 'Guatemala'],
-                     ['es-HN', 'Honduras'],
-                     ['es-MX', 'México'],
-                     ['es-NI', 'Nicaragua'],
-                     ['es-PA', 'Panamá'],
-                     ['es-PY', 'Paraguay'],
-                     ['es-PE', 'Perú'],
-                     ['es-PR', 'Puerto Rico'],
-                     ['es-DO', 'República Dominicana'],
-                     ['es-UY', 'Uruguay'],
-                     ['es-VE', 'Venezuela']],
- ['Euskara',         ['eu-ES']],
- ['Filipino',        ['fil-PH']],
- ['Français',        ['fr-FR']],
- ['Basa Jawa',       ['jv-ID']],
- ['Galego',          ['gl-ES']],
- ['ગુજરાતી',           ['gu-IN']],
- ['Hrvatski',        ['hr-HR']],
- ['IsiZulu',         ['zu-ZA']],
- ['Íslenska',        ['is-IS']],
- ['Italiano',        ['it-IT', 'Italia'],
-                     ['it-CH', 'Svizzera']],
- ['ಕನ್ನಡ',             ['kn-IN']],
- ['ភាសាខ្មែរ',          ['km-KH']],
- ['Latviešu',        ['lv-LV']],
- ['Lietuvių',        ['lt-LT']],
- ['മലയാളം',          ['ml-IN']],
- ['मराठी',             ['mr-IN']],
- ['Magyar',          ['hu-HU']],
- ['ລາວ',              ['lo-LA']],
- ['Nederlands',      ['nl-NL']],
- ['नेपाली भाषा',        ['ne-NP']],
- ['Norsk bokmål',    ['nb-NO']],
- ['Polski',          ['pl-PL']],
- ['Português',       ['pt-BR', 'Brasil'],
-                     ['pt-PT', 'Portugal']],
- ['Română',          ['ro-RO']],
- ['සිංහල',          ['si-LK']],
- ['Slovenščina',     ['sl-SI']],
- ['Basa Sunda',      ['su-ID']],
- ['Slovenčina',      ['sk-SK']],
- ['Suomi',           ['fi-FI']],
- ['Svenska',         ['sv-SE']],
- ['Kiswahili',       ['sw-TZ', 'Tanzania'],
-                     ['sw-KE', 'Kenya']],
- ['ქართული',       ['ka-GE']],
- ['Հայերեն',          ['hy-AM']],
- ['தமிழ்',            ['ta-IN', 'இந்தியா'],
-                     ['ta-SG', 'சிங்கப்பூர்'],
-                     ['ta-LK', 'இலங்கை'],
-                     ['ta-MY', 'மலேசியா']],
- ['తెలుగు',           ['te-IN']],
- ['Tiếng Việt',      ['vi-VN']],
- ['Türkçe',          ['tr-TR']],
- ['اُردُو',            ['ur-PK', 'پاکستان'],
-                     ['ur-IN', 'بھارت']],
- ['Ελληνικά',         ['el-GR']],
- ['български',         ['bg-BG']],
- ['Pусский',          ['ru-RU']],
- ['Српски',           ['sr-RS']],
- ['Українська',        ['uk-UA']],
- ['한국어',            ['ko-KR']],
- ['中文',             ['cmn-Hans-CN', '普通话 (中国大陆)'],
-                     ['cmn-Hans-HK', '普通话 (香港)'],
-                     ['cmn-Hant-TW', '中文 (台灣)'],
-                     ['yue-Hant-HK', '粵語 (香港)']],
- ['日本語',           ['ja-JP']],
- ['हिन्दी',             ['hi-IN']],
- ['ภาษาไทย',         ['th-TH']]];
-
-for (var i = 0; i < langs.length; i++) {
-  select_language.options[i] = new Option(langs[i][0], i);
-}
-select_language.selectedIndex = 10;
-updateCountry();
-select_dialect.selectedIndex = 11;
-showInfo('info_start');
-
-function updateCountry() {
-  for (var i = select_dialect.options.length - 1; i >= 0; i--) {
-    select_dialect.remove(i);
-  }
-  var list = langs[select_language.selectedIndex];
-  for (var i = 1; i < list.length; i++) {
-    select_dialect.options.add(new Option(list[i][1], list[i][0]));
-  }
-  select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
-}
-
-/*
- * Set up recognizer
- */
-var final_transcript = '';
-var recognizing = false;
-var ignore_onend;
-var start_timestamp;
-if (!('webkitSpeechRecognition' in window)) {
-  upgrade();
-} else {
-  start_button.style.display = 'inline-block';
-  var recognition = new webkitSpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = true;
-
-  recognition.onstart = function() {
-    recognizing = true;
-    showInfo('info_speak_now');
-  };
-
-  // Things that can go wrong
-  recognition.onerror = function(event) {
-    if (event.error == 'no-speech') {
-      showInfo('info_no_speech');
-      ignore_onend = true;
-    }
-    if (event.error == 'audio-capture') {
-      showInfo('info_no_microphone');
-      ignore_onend = true;
-    }
-    if (event.error == 'not-allowed') {
-      if (event.timeStamp - start_timestamp < 200) {
-        showInfo('info_blocked');
-      } else {
-        showInfo('info_denied');
+      if (randomShape == "circle") {
+        shp = new Circle();
+      } else if (randomShape == "rectangle") {
+        shp = new Rectangle();
       }
-      ignore_onend = true;
-    }
-  };
 
-  recognition.onend = function() {
-    recognizing = false;
-    if (ignore_onend) {
-      return;
-    }
-    if (!final_transcript) {
-      showInfo('info_start');
-      return;
-    }
-    showInfo('');
-    if (window.getSelection) {
-      window.getSelection().removeAllRanges();
-      var range = document.createRange();
-      range.selectNode(document.getElementById('final_span'));
-      window.getSelection().addRange(range);
+      runningShapes.push(shp); // Put the initialized item in the arrayList
+      // console.log("call launch shape");
     }
 
-    // Display or otherwise utilize result
-    doit (final_transcript);
-  };
+    // Shoot a gun
+    function shootAShot(type) {
+      var sht;
 
-  recognition.onresult = function(event) {
-    var interim_transcript = '';
-    if (typeof(event.results) == 'undefined') {
-      recognition.onend = null;
-      recognition.stop();
-      upgrade();
-      return;
-    }
-
-    // event.results is an array of the recognized strings
-    for (var i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal) {
-        final_transcript += event.results[i][0].transcript;
-      } else {
-        interim_transcript += event.results[i][0].transcript;
+      if (type == "circle") {
+        sht = new Gun(player, "Circle");
+      } else if (type == "rectangle") {
+        sht = new Gun(player, "Rectangle");
+      } else if (type == "triangle") {
+        sht = new Gun(player, "Triangle");
+      } else if (type == "square") {
+        sht = new Gun(player, "Square");
+      } else if (type == "rhombus") {
+        sht = new Gun(player, "Rhombus");
+      } else if (type == "parallelogram") {
+        sht = new Gun(player, "Parallelogram");
+      } else if (type == "pentagon") {
+        sht = new Gun(player, "Pentagon");
+      } else if (type == "hexagon") {
+        sht = new Gun(player, "Hexagon");
       }
-      if(interim_transcript.includes("whatwhat")){
-        alert("whatwhat");
-      }
+      console.log(sht);
+
+      shootingShots.push(sht); // Put the initialized item in the arrayList
+      sht.setShooting(true); // Set isShot state as true
+
+      // console.log("Shoot a shot");
     }
 
-    final_span.innerHTML = linebreak(final_transcript);
-    interim_span.innerHTML = linebreak(interim_transcript);
-  };
-}
+    // function isInside(bb, point) {
+    //   if( bb.ix <= p.x && p.x <= bb.ax && bb.iy <= p.y && p.y <= bb.ay ) {
+      // bb is the bounding box, (ix, iy) are its top-left coordinates
+      // (ax, ay) are its bottom-right coordinates
+    //   }
+    // }
 
-// User message about browser
-function upgrade() {
-  start_button.style.visibility = 'hidden';
-  showInfo('info_upgrade');
-}
-
-// Convert line breaks to HTML
-var two_line = /\n\n/g;
-var one_line = /\n/g;
-function linebreak(s) {
-  return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
-}
-
-function startButton(event) {
-  // Stop
-  if (recognizing) {
-    recognition.stop();
-  }
-
-  // Start
-  else {
-    final_transcript = '';
-    recognition.lang = select_dialect.value;
-    recognition.start();
-    ignore_onend = false;
-    final_span.innerHTML = '';
-    interim_span.innerHTML = '';
-    showInfo('info_allow');
-    start_timestamp = event.timeStamp;
-  }
-  recognition.stop();
-}
-
-// Display selected message, hide others
-function showInfo(s) {
-  if (s) {
-    for (var child = info.firstChild; child; child = child.nextSibling) {
-      if (child.style) {
-        child.style.display = child.id == s ? 'inline' : 'none';
+    // Check if objects collide with each other
+    function isCollided(obj1, obj2) {
+      console.log("isCollided ", obj1.x, " ", obj2.x)
+      if (obj1.x < obj2.x + obj2.width  && obj1.x + obj1.width  > obj2.x &&
+    		  obj1.y < obj2.y + obj2.height && obj1.y + obj1.height > obj2.y) {
+      // The objects are touching
+        return true;
       }
+
+
+    //   var obj1Rect = obj1.getBoundingClientRect();
+    //   var obj2Rect = obj1.getBoundingClientRect();
+     //
+    //   if (
+    //    ((obj1Rect.top + obj1Rect.height) < (obj2Rect.top)) ||
+    //    (obj1Rect.top > (obj2Rect.top + obj2Rect.height)) ||
+    //    ((obj1Rect.left + obj1Rect.width) < obj2Rect.left) ||
+    //    (obj1Rect.left > (obj2Rect.left + obj2Rect.width))
+    //  ) {
+    //    return true;
+    //  }
+
+      // var topLeft = new Point(obj1.x, obj1.y);
+      // var topRight = new Point(obj1.x+obj1.width, obj1.y);
+      // var bottomLeft = new Point(obj1.x, obj1.y+obj1.height);
+      // var bottomRight = new Point(obj1.x+obj1.width, obj1.y+obj1.height);
+
+      // if (inInside(obj1, topLeft)) {
+      //     return true;
+      // } else if (obj2.inInside(topRight)) {
+      //     return true;
+      // } else if (obj2.inInside(bottomLeft)) {
+      //     return true;
+      // } else if (obj2.inInside(bottomRight)) {
+      //     return true;
+      // }
+
+      // topLeft = new Point(obj2.x, obj2.y);
+      // topRight = new Point(obj2.x+obj2.width, obj2.y);
+      // bottomLeft = new Point(obj2.x, obj2.y+obj2.height);
+      // bottomRight = new Point(obj2.x+obj2.width, obj2.y+obj2.height);
+      //
+      // if (obj1.contains(topLeft)) {
+      //     return true;
+      // } else if (obj1.contains(topRight)) {
+      //     return true;
+      // } else if (obj1.contains(bottomLeft)) {
+      //     return true;
+      // } else if (obj1.contains(bottomRight)) {
+      //     return true;
+      // }
+      return false;
     }
-    info.style.visibility = 'visible';
-  } else {
-    info.style.visibility = 'hidden';
-  }
-}
 
-/*
- ***************************************************************************
- * Voice drawing program, just an example of usage of above code
- ***************************************************************************
- */
 
-// "Roy G Biv" colors only
-var colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"]
+    // func  tion select(event) {
+    //   var x = event.clientX;
+    //   var y = event.clientY;
+    //   var rect = c.getBoundingClientRect();
+    //   var collide = false;
+    //
+    //   for (i = 0; i < animals.length; i++) {
+    //     var boundX = animals[i].x - (animals[i].size / 2);
+    //     var boundY = animals[i].y - (animals[i].size / 2);
+    //
+    //     if (boundX <= x + rect.left && x + rect.left <= (boundX + animals[i].size) &&
+    //       boundY <= y - rect.top && y - rect.top <= (boundY + animals[i].size)) {
+    //       selected = animals[i];
+    //       collide = true;
+    //
+    //       document.getElementById("statusmsg").innerHTML =
+    //         "Mouse down at " + event.clientX + ", " + event.clientY;
+    //       break;
+    //     }
+    //   }
+    //   if (!collide) {
+    //     create(event);
+    //     selected = null;
+    //
+    //     document.getElementById("statusmsg").innerHTML =
+    //       "Mouse down at " + event.clientX + ", " + event.clientY;
+    //   }
+    //   update();
+    // }
+  </script>
 
-// Limited set of shapes
-var shapes = ["square", "rectangle", "circle", "ellipse"]
+</head>
 
-function doit (string) {
-	/*
-	 * Example of something you could do with the recognized text
-	 */
-
-	string = string.toLowerCase()
-
-	// Search for a color, else we choose black
-	var color = colors.filter (
-		function (c) {
-			return string.match (new RegExp ("\\b" + c + "\\b"))
-		}) [0]
-
-	// Search for a shape, else we don't draw
-	var shape = shapes.filter (
-		function (s) {
-			return string.match (new RegExp ("\\b" + s + "\\b"))
-		}) [0]
-
-	// If found a shape, draw it
-	if (shape) {
-		var canvas = document.getElementById ("MyCanvas");
-		var gc = canvas.getContext ("2d")
-		gc.fillStyle = color? color: "black"
-
-		// Generate some random coordinates
-		var x = 50 + Math.floor (400 * Math.random ())
-		var y = 50 + Math.floor (400 * Math.random ())
-		var w = 20 + Math.floor (100 * Math.random ())
-		var h = 20 + Math.floor (100 * Math.random ())
-
-		if (shape=="square") {
-			gc.fillRect (x, y, w, w)
-		}
-		else if (shape=="rectangle") {
-			gc.fillRect (x, y, w, h)
-		}
-		else if (shape=="circle") {
-			gc.beginPath();
-			gc.arc (x, y, w/2, 0, Math.PI * 2);
-			gc.fill();
-		}
-		else if (shape=="ellipse") {
-			gc.beginPath();
-			gc.ellipse (x, y, w/2, h/2, 0, 0, Math.PI * 2);
-			gc.fill();
-		}
-	}
-
-	// For testing, display the understood message (2 words)
-	console.log ("Color = " + color + ", Shape = " + shape)
-}
-
-    </script>
-     <div id="buttonarea">
+<body>
+  <div id="title">
+    <h1>Assignment 8</h1>
+  </div>
+  <canvas id="MyCanvas" ></canvas>
+  <div id="buttonarea">
     &nbsp;
   </div>
   <p><b>Status: </b></b><span id="statusmsg">(Nothing Here)</span></p>
   <p><b>Animal Count: </b></b><span id="count">0</span></p>
   <p><b>Selected Animal: </b></b><span id="selected" style="font-size:60px;"></span></p>
-  </body>
+</body>
+
 </html>
