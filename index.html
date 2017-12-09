@@ -51,6 +51,7 @@
         e.preventDefault();
 
         let type = "circle"; // test input
+        console.log("pressed arrow key")
         shootAShot(type);
         // console.log('Shoot a shot');
       }
@@ -111,32 +112,19 @@
       c.width = window.innerWidth;
       c.height = window.innerHeight-100;
 
-      // Key event listener
-      // c.addEventListener('keydown', function(event) {
-      //     if(event.keyCode == 32) {
-      //         player.setJumped(true);
-      //     }
-      //     console.log("press the space bar");
-      // });
-      // c.focus();
-
       gameStart = false;
-      // Create Player and Gun
+
+      // Create player
       player = new Player();
-      // hit = false;
-      // gun = new Gun(player, "Circle");
 
-      // Create Shapes
-      // createShape(20);
-
-      // Create clouds
+      // Create background stuff
       for (var i=0; i<5; i++) {
         var cloud = new Cloud();
         clouds.push(cloud);
       }
       ground = new Ground();
 
-      // Draw background, Player
+      // Draw everything
       drawAll();
 
       // Add buttons
@@ -148,46 +136,12 @@
 
     <!-- Function -->
     function drawBackground() {
-      // Draw background color
-      var grd=gc.createLinearGradient(0,75,0,750);
-      grd.addColorStop(0,"#FFAFBD");
-      grd.addColorStop(1,"#ffc3a0");
-      gc.fillStyle = "#EEEEEE"; //#43C6AC #FFAFBD #d3d3d3 #FFEB3B grd
+      var grd=gc.createLinearGradient(0,75,0,750); // gradiation color
+      // grd.addColorStop(0,"#FFAFBD");
+      // grd.addColorStop(1,"#ffc3a0");
+      gc.fillStyle = "#EEEEEE"; //EEEEEE #43C6AC #FFAFBD ffc3a0 #d3d3d3 #FFEB3B grd
       gc.fillRect(0, 0, c.width, c.height);
-
-      // Draw ground images
-      // let x = 0;
-      // let y = c.height/9;
-      // let image = 'images/ground1.png';
-      // window.onload = function(){
-      //   context.drawImage(image, x, y);
-      // }
-      // console.log("draw ground image");
     }
-
-    // Make new shape items and put them in waitingShapes array list
-    // function createShape(int) {
-    //   console.log("call create shape");
-    //   // Make an arrayList for containing all types of shapes
-    //   var shapeType = [];
-    //   shapeType.push("circle", "rectangle"); //"square", "ellipse", "triangle"
-    //
-    //   // Get a random type of shape
-    //   var randomShape = shapeType[Math.floor(Math.random() * shapeType.length)];
-    //
-    //   for (var i=0; i<int; i++) {
-    //     var shp;
-    //
-    //     if (randomShape == "circle") {
-    //       shp = new Circle();
-    //     } else if (randomShape == "rectangle") {
-    //       shp = new Rectangle();
-    //     }
-    //     // Put the initialized item in the arrayList
-    //     waitingShapes.push(shp);
-    //     console.log(i + " create shape")
-    //   }
-    // }
 
     function drawAll() {
       gc.clearRect(0, 0, c.width, c.height);
@@ -205,11 +159,14 @@
       }
 
       // Player
-      player.draw(gc);
+      if (player.y > 1) {
+        player.draw(gc);
+        // gameOver();
+      }
 
       // Gun
       for (var i=0; i<shootingShots.length; i++) {
-        var shot = this.shootingShots[i];
+        var shot = shootingShots[i];
         shot.draw(gc);
       }
 
@@ -221,7 +178,6 @@
     }
 
     function tick() {
-
       if (gameStart) {
         frame ++;
 
@@ -238,42 +194,61 @@
         player.tick();
 
         // Gun
-        for (var i=0; i<shootingShots.length; i++) {
-          var shot = this.shootingShots[i];
+        let removedShapes = [];
+        let removedShots = [];
+        for (var i=0; i< shootingShots.length; i++) {
+          var shot = shootingShots[i];
           shot.tick(gc);
+          if (shot.x > c.width) { // Remove shots if they disappear from the sight
+            removedShapes.push(i);
+          }
         }
+        removedShapes.forEach(function (i) {
+          shootingShots.splice(i, 1);
+        });
 
         // Shapes
         for (var i=0; i< runningShapes.length; i++) {
           var shape = this.runningShapes[i];
           shape.tick();
+          if (shape.x < -40) { // Remove shapes if they disappear from the sight
+            removedShapes.push(i);
+          }
         }
+        removedShapes.forEach(function (i) {
+          runningShapes.splice(i, 1);
+          removedShapes = [];
+        });
 
-        // Check collision between player and shapes
+        // Check collision
         for (var i=0; i< runningShapes.length; i++) {
           var shape = this.runningShapes[i];
-          console.log("collision check");
-          if (isCollided(player, shape)) {
-            console.log("damaged");
-            // player.decreaseSize
+          // Player and shapes
+          if (shape.contains(player.frontX, player.middleY)) {
+            removedShapes.push(i);
+            console.log("Damaged");
+            player.setScale(3);
           }
-          // for (var i=0; i< shootingShots.length; i++) { // shots and shapes
-          //   var shot = this.shootingShots[i];
-          //   if (collided(shape, shot)) {
-          //     shootingShots.remove(shot);
-          //     runningShapes.remove(shape);
-          //     console.log("good job!");
-          //   }
-          // }
+          // Shots and shapes
+          for (var n=0; n< shootingShots.length; n++) {
+            var shot = shootingShots[n];
+            if (shape.contains(shot.width, shot.height)) {
+              removedShots.push(n);
+              console.log("Good job");
+            }
+          }
         }
-
-        setTimeout(tick, 100); // tick every 100 msec
+        removedShapes.forEach(function (i) {
+          runningShapes.splice(i, 1);
+          removedShapes = [];
+        });
+        removedShots.forEach(function (n) {
+          shootingShots.splice(n, 1);
+          removedShots = [];
+        });
+        setTimeout(tick, 100); // Tick every 100 msec
       }
-
-
-
-      // Redraw all with updated data
-      drawAll();
+      drawAll(); // Redraw all with updated data
     }
 
     function launchShape() {
@@ -283,16 +258,13 @@
       // Get a random type of shape
       var randomShape = shapeType[Math.floor(Math.random() * shapeType.length)];
       var shp;
-      console.log("launch " ,shp);
 
       if (randomShape == "circle") {
         shp = new Circle();
       } else if (randomShape == "rectangle") {
         shp = new Rectangle();
       }
-
       runningShapes.push(shp); // Put the initialized item in the arrayList
-      // console.log("call launch shape");
     }
 
     // Shoot a gun
@@ -316,105 +288,10 @@
       } else if (type == "hexagon") {
         sht = new Gun(player, "Hexagon");
       }
-      console.log(sht);
-
       shootingShots.push(sht); // Put the initialized item in the arrayList
       sht.setShooting(true); // Set isShot state as true
-
-      // console.log("Shoot a shot");
     }
 
-    // function isInside(bb, point) {
-    //   if( bb.ix <= p.x && p.x <= bb.ax && bb.iy <= p.y && p.y <= bb.ay ) {
-      // bb is the bounding box, (ix, iy) are its top-left coordinates
-      // (ax, ay) are its bottom-right coordinates
-    //   }
-    // }
-
-    // Check if objects collide with each other
-    function isCollided(obj1, obj2) {
-      console.log("isCollided ", obj1.x, " ", obj2.x)
-      if (obj1.x < obj2.x + obj2.width  && obj1.x + obj1.width  > obj2.x &&
-    		  obj1.y < obj2.y + obj2.height && obj1.y + obj1.height > obj2.y) {
-      // The objects are touching
-        return true;
-      }
-
-
-    //   var obj1Rect = obj1.getBoundingClientRect();
-    //   var obj2Rect = obj1.getBoundingClientRect();
-     //
-    //   if (
-    //    ((obj1Rect.top + obj1Rect.height) < (obj2Rect.top)) ||
-    //    (obj1Rect.top > (obj2Rect.top + obj2Rect.height)) ||
-    //    ((obj1Rect.left + obj1Rect.width) < obj2Rect.left) ||
-    //    (obj1Rect.left > (obj2Rect.left + obj2Rect.width))
-    //  ) {
-    //    return true;
-    //  }
-
-      // var topLeft = new Point(obj1.x, obj1.y);
-      // var topRight = new Point(obj1.x+obj1.width, obj1.y);
-      // var bottomLeft = new Point(obj1.x, obj1.y+obj1.height);
-      // var bottomRight = new Point(obj1.x+obj1.width, obj1.y+obj1.height);
-
-      // if (inInside(obj1, topLeft)) {
-      //     return true;
-      // } else if (obj2.inInside(topRight)) {
-      //     return true;
-      // } else if (obj2.inInside(bottomLeft)) {
-      //     return true;
-      // } else if (obj2.inInside(bottomRight)) {
-      //     return true;
-      // }
-
-      // topLeft = new Point(obj2.x, obj2.y);
-      // topRight = new Point(obj2.x+obj2.width, obj2.y);
-      // bottomLeft = new Point(obj2.x, obj2.y+obj2.height);
-      // bottomRight = new Point(obj2.x+obj2.width, obj2.y+obj2.height);
-      //
-      // if (obj1.contains(topLeft)) {
-      //     return true;
-      // } else if (obj1.contains(topRight)) {
-      //     return true;
-      // } else if (obj1.contains(bottomLeft)) {
-      //     return true;
-      // } else if (obj1.contains(bottomRight)) {
-      //     return true;
-      // }
-      return false;
-    }
-
-
-    // func  tion select(event) {
-    //   var x = event.clientX;
-    //   var y = event.clientY;
-    //   var rect = c.getBoundingClientRect();
-    //   var collide = false;
-    //
-    //   for (i = 0; i < animals.length; i++) {
-    //     var boundX = animals[i].x - (animals[i].size / 2);
-    //     var boundY = animals[i].y - (animals[i].size / 2);
-    //
-    //     if (boundX <= x + rect.left && x + rect.left <= (boundX + animals[i].size) &&
-    //       boundY <= y - rect.top && y - rect.top <= (boundY + animals[i].size)) {
-    //       selected = animals[i];
-    //       collide = true;
-    //
-    //       document.getElementById("statusmsg").innerHTML =
-    //         "Mouse down at " + event.clientX + ", " + event.clientY;
-    //       break;
-    //     }
-    //   }
-    //   if (!collide) {
-    //     create(event);
-    //     selected = null;
-    //
-    //     document.getElementById("statusmsg").innerHTML =
-    //       "Mouse down at " + event.clientX + ", " + event.clientY;
-    //   }
-    //   update();
-    // }
   </script>
 
 </head>
@@ -428,8 +305,8 @@
     &nbsp;
   </div>
   <p><b>Status: </b></b><span id="statusmsg">(Nothing Here)</span></p>
-  <p><b>Animal Count: </b></b><span id="count">0</span></p>
-  <p><b>Selected Animal: </b></b><span id="selected" style="font-size:60px;"></span></p>
+  <!-- <p><b>Animal Count: </b></b><span id="count">0</span></p>
+  <p><b>Selected Animal: </b></b><span id="selected" style="font-size:60px;"></span></p> -->
 </body>
 
 </html>
