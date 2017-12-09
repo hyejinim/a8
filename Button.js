@@ -18,12 +18,13 @@ class Button {
 
     if (label == "Start") {
       gameStart = true;
-      setInterval(launchShape, 2000); // launch a new object every 3000 msec
+      this.shapeTimerID = setInterval(launchShape, 2000); // launch a new object every 2000 msec (2sec)
       tick();
       this.button.blur();
     } else if (label == "Stop") {
       // player.bound();
       gameStart = false;
+      clearInterval(this.shapeTimerID);
       // setInterval(launchShape, 0);
     }
   }
