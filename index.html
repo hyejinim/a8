@@ -169,8 +169,6 @@
       gc.clearRect(0, 0, c.width, c.height);
       // Background
       drawBackground();
-      drawScore(gc);
-
       // Ground
       ground.draw(gc);
 
@@ -180,6 +178,9 @@
         cloud.draw(gc);
         // console.log("draw cloud");
       }
+
+      // Score
+      drawScore(gc);
 
       // Player
       player.draw(gc);
