@@ -1,7 +1,7 @@
 class Ground {
   constructor() {
     this.x = 0;
-    this.y = c.height * 4/5;
+    this.y = c.height * 3.5/5;
     this.x2 = this.x + c.width;
     this.image = new Image();
     this.image.src = 'images/ground.png';
@@ -17,8 +17,6 @@ class Ground {
     }
     context.drawImage(image, x, y, c.width, 70);
     context.drawImage(image, x2, y, c.width, 70);
-    // For animation
-    // context.drawImage(image, x, y, c.width, 40);
   }
   setPosition(x, y) {
     this.x = x;
