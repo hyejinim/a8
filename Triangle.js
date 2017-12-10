@@ -1,3 +1,6 @@
+// Hyejin Im, hyejin.im@tufts.edu
+// Kam Chan Kang, Kamchan.Kang@tufts.edu
+
 class Triangle extends Shape {
   constructor() {
     super();
