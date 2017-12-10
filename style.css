@@ -22,7 +22,8 @@
 }
 
 #button:hover {
-  background-color: #2E7D32;
+  background-color: #212121;
+  /*#2E7D32*/
 }
 
 #button2 {
