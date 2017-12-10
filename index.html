@@ -16,7 +16,7 @@
   <script src="Circle.js"></script>
   <script src="Rectangle.js"></script>
   <script src="Triangle.js"></script>
-  <script src="Rhombus.js"></script>
+  <script src="Diamond.js"></script>
   <script src="Parallel.js"></script>
   <script src="Trapezoid.js"></script>
   <script src="Pentagon.js"></script>
@@ -33,21 +33,10 @@
     var waitingShapes = [];
     var runningShapes = [];
     var player;
-    // var gun;
     var ground;
-    // var hit;
     var shootingShots = [];
     var clouds = [];
     var gameStart;
-
-    // Shape colors
-    var colors = ['#FFFF8D',
-    							'#dff69e',
-              		'#00ceff',
-    							'#ee78aa',
-              		'#3f159f',
-              		'#71b583',
-              		'#00a2ff'];
 
     <!-- onload Function -->
     window.onkeydown = function(e) {
@@ -61,7 +50,6 @@
         let type = "circle"; // test input
         console.log("pressed arrow key")
         shootAShot(type);
-        // console.log('Shoot a shot');
       }
       else if (e.keyCode == 83 && e.target == document.body) {
         e.preventDefault();
@@ -125,7 +113,7 @@
       // Create player
       player = new Player();
 
-      // Create background stuff
+      // Create clouds and ground
       for (var i=0; i<5; i++) {
         var cloud = new Cloud();
         clouds.push(cloud);
@@ -144,10 +132,10 @@
 
     <!-- Function -->
     function drawBackground() {
-      var grd=gc.createLinearGradient(0,75,0,750); // gradiation color
+      // var grd=gc.createLinearGradient(0,75,0,750); // gradiation color
       // grd.addColorStop(0,"#FFAFBD");
       // grd.addColorStop(1,"#ffc3a0");
-      gc.fillStyle = "#EEEEEE"; //EEEEEE #43C6AC #FFAFBD ffc3a0 #d3d3d3 #FFEB3B grd
+      gc.fillStyle = "#EEEEEE";
       gc.fillRect(0, 0, c.width, c.height);
     }
 
@@ -169,6 +157,7 @@
       gc.clearRect(0, 0, c.width, c.height);
       // Background
       drawBackground();
+
       // Ground
       ground.draw(gc);
 
@@ -178,9 +167,6 @@
         cloud.draw(gc);
         // console.log("draw cloud");
       }
-
-      // Score
-      drawScore(gc);
 
       // Player
       player.draw(gc);
@@ -196,6 +182,9 @@
         var shape = this.runningShapes[i];
         shape.draw(gc);
       }
+
+      // Score
+      drawScore(gc);
 
       // Game over
       if (player.life == 0) {
@@ -224,7 +213,6 @@
         }
 
         // Gun
-
         let removedShots = [];
         for (var i=0; i< shootingShots.length; i++) {
           var shot = shootingShots[i];
@@ -237,22 +225,21 @@
           shootingShots.splice(i, 1);
         });
 
-
-        let removed = [];
         // Shapes
+        let removedShapes = [];
         for (var i=0; i< runningShapes.length; i++) {
           var shape = this.runningShapes[i];
           console.log(shape);
           shape.tick();
           if (shape.x < -40) { // Remove shapes if they disappear from the sight
-            removed.push(i);
+            removedShapes.push(i);
           }
         }
-        removed.forEach(function (i) {
+        removedShapes.forEach(function (i) {
           runningShapes.splice(i, 1);
         });
 
-        removed = [];
+        removedShapes = [];
         removedShots = [];
         // Check collision
         for (var i=0; i< runningShapes.length; i++) {
@@ -260,29 +247,27 @@
           // Player and shapes
           if (shape.contains(player.frontX, player.middleY)) {
             player.loseLife();
-            removed.push(i);
+            removedShapes.push(i);
+            console.log("Lose one life (now: )", player.life, ")");
           }
           // Shots and shapes
           for (var n=0; n< shootingShots.length; n++) {
             var shot = shootingShots[n];
             if (shape.contains(shot.x, shot.y)) {
-              // console.log("shot ", shot.type, " ", "shape ", shape.type);
               if (shape.type == shot.type) {
                 removedShots.push(n);
-                removed.push(i);
+                removedShapes.push(i);
                 console.log("Good job");
               }
             }
           }
         }
-        removed.forEach(function (i) {
+        removedShapes.forEach(function (i) {
           runningShapes.splice(i, 1);
-          console.log("==================================Removed shape")
         });
 
         removedShots.forEach(function (n) {
           shootingShots.splice(n, 1);
-          console.log("Removed shot")
         });
         setTimeout(tick, 100); // Tick every 100 msec
       }
@@ -291,20 +276,21 @@
 
     function launchShape() {
       // Containing all types of shapes
-      shapeType.push("circle", "rectangle", "triangle", "rhombus", "pentagon", "hexagon", "parallel", "trapezoid"); //"square"
+      shapeType.push("circle", "rectangle", "triangle", "diamond", "pentagon", "hexagon", "parallel", "trapezoid");
 
       // Get a random type of shape
       var randomShape = shapeType[Math.floor(Math.random() * shapeType.length)];
       var shp;
 
+      // Create the shape
       if (randomShape == "circle") {
         shp = new Circle();
       } else if (randomShape == "rectangle") {
         shp = new Rectangle();
       } else if (randomShape == "triangle") {
         shp = new Triangle();
-      } else if (randomShape == "rhombus") {
-        shp = new Rhombus();
+      } else if (randomShape == "diamond") {
+        shp = new Diamond();
       } else if (randomShape == "pentagon") {
         shp = new Pentagon();
       } else if (randomShape == "hexagon") {
@@ -329,8 +315,8 @@
         sht = new Gun(player, "triangle");
       } else if (type == "square") {
         sht = new Gun(player, "square");
-      } else if (type == "rhombus") {
-        sht = new Gun(player, "rhombus");
+      } else if (type == "diamond") {
+        sht = new Gun(player, "diamond");
       } else if (type == "parallelogram") {
         sht = new Gun(player, "parallelogram");
       } else if (type == "pentagon") {
@@ -342,23 +328,19 @@
       sht.setShooting(true); // Set isShot state as true
     }
 
-
-
   </script>
 
 </head>
 
 <body>
   <div id="title">
-    <h1>Assignment 8</h1>
+    <h1>Speak Go</h1>
   </div>
   <canvas id="MyCanvas" ></canvas>
   <div id="buttonarea">
     &nbsp;
   </div>
-  <p><b>Status: </b></b><span id="statusmsg">(Nothing Here)</span></p>
-  <!-- <p><b>Animal Count: </b></b><span id="count">0</span></p>
-  <p><b>Selected Animal: </b></b><span id="selected" style="font-size:60px;"></span></p> -->
+  <!-- <p><b>Status: </b></b><span id="statusmsg">(Nothing Here)</span></p> -->
 </body>
 
 </html>
