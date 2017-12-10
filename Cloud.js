@@ -6,7 +6,7 @@ class Cloud {
     this.x = Math.random() * c.width;
     this.y = Math.random() * (c.height/3);
     this.image = new Image();
-    this.image.src = 'images/cloud.png';
+    this.image.src = 'cloud.png';
 
   }
   draw(context) {
