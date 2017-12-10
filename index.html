@@ -223,33 +223,36 @@
         }
 
         // Gun
-        let removedShapes = [];
+
         let removedShots = [];
         for (var i=0; i< shootingShots.length; i++) {
           var shot = shootingShots[i];
           shot.tick(gc);
           if (shot.x > c.width) { // Remove shots if they disappear from the sight
-            removedShapes.push(i);
+            removedShots.push(i);
           }
         }
-        removedShapes.forEach(function (i) {
+        removedShots.forEach(function (i) {
           shootingShots.splice(i, 1);
         });
 
+
+        let removed = [];
         // Shapes
         for (var i=0; i< runningShapes.length; i++) {
           var shape = this.runningShapes[i];
           console.log(shape);
           shape.tick();
           if (shape.x < -40) { // Remove shapes if they disappear from the sight
-            removedShapes.push(i);
+            removed.push(i);
           }
         }
-        removedShapes.forEach(function (i) {
+        removed.forEach(function (i) {
           runningShapes.splice(i, 1);
-          removedShapes = [];
         });
 
+        removed = [];
+        removedShots = [];
         // Check collision
         for (var i=0; i< runningShapes.length; i++) {
           var shape = this.runningShapes[i];
@@ -264,20 +267,19 @@
               // console.log("shot ", shot.type, " ", "shape ", shape.type);
               if (shape.type == shot.type) {
                 removedShots.push(n);
-                removedShapes.push(i);
+                removed.push(i);
                 console.log("Good job");
               }
             }
           }
         }
-        removedShapes.forEach(function (i) {
+        removed.forEach(function (i) {
           runningShapes.splice(i, 1);
-          removedShapes = [];
-          console.log("Removed shape")
+          console.log("==================================Removed shape")
         });
+
         removedShots.forEach(function (n) {
           shootingShots.splice(n, 1);
-          removedShots = [];
           console.log("Removed shot")
         });
         setTimeout(tick, 100); // Tick every 100 msec
