@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Assignment 8</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="Ground.js"></script>
+  <script src="Cloud.js"></script>
+  <script src="Player.js"></script>
+  <script src="Gun.js"></script>
+  <script src="Shape.js"></script>
+  <script src="Circle.js"></script>
+  <script src="Rectangle.js"></script>
+  <script src="Triangle.js"></script>
+  <script src="Diamond.js"></script>
+  <script src="Parallel.js"></script>
+  <script src="Trapezoid.js"></script>
+  <script src="Pentagon.js"></script>
+  <script src="Hexagon.js"></script>
+  <script src="Button.js"></script>
+  <script src="utils.js"></script>
+
+  <script type="text/javascript">
+
+    // Globals variables
+    var c, gc;
+    var frame = 0;
+    var shapeType = [];
+    var waitingShapes = [];
+    var runningShapes = [];
+    var player;
+    var ground;
+    var shootingShots = [];
+    var clouds = [];
+    var gameStart;
+
+    window.onkeydown = function(e) {
+      if (e.keyCode == 32 || e.keyCode == 38 && e.target == document.body) {
+        e.preventDefault();
+        player.setJumped(true);
+      }
+    }
+
+    window.onload = function() {
+      // Set up canvas
+      c = document.getElementById("MyCanvas");
+      gc = c.getContext("2d");
+      c.width = window.innerWidth;
+      c.height = window.innerHeight-100;
+
+      init();
+
+      // Draw everything
+      drawAll();
+
+      // Add buttons
+      new Button("Start");
+      new Button("Stop");
+
+      console.log("onload")
+    }
+
+    <!-- Function -->
+    function init() {
+      gameStart = false;
+
+      // Create player
+      player = new Player();
+
+      // Create clouds and ground
+      for (var i=0; i<5; i++) {
+        var cloud = new Cloud();
+        clouds.push(cloud);
+      }
+      ground = new Ground();
+    }
+
+    function drawBackground() {
+      // var grd=gc.createLinearGradient(0,75,0,750); // gradiation color
+      // grd.addColorStop(0,"#FFAFBD");
+      // grd.addColorStop(1,"#ffc3a0");
+      gc.fillStyle = "#EEEEEE";
+      gc.fillRect(0, 0, c.width, c.height);
+    }
+
+    function drawGameOver(context) {
+      context.fillStyle = "#000000";
+      context.font = 50 + "px Helvetica";
+      context.textAlign="center";
+      context.fillText("G A M E  O V E R", c.width/2, c.height/2);
+    }
+
+    function drawScore(context) {
+      context.fillStyle = "#000000";
+      context.font = 50 + "px Helvetica";
+      context.textAlign="center";
+      context.fillText(frame, c.width/2, c.height * 1/7);
+    }
+
+    function drawAll() {
+      gc.clearRect(0, 0, c.width, c.height);
+      // Background
+      drawBackground();
+
+      // Ground
+      ground.draw(gc);
+
+      // Clouds
+      for (var i=0; i<clouds.length; i++) {
+        var cloud = this.clouds[i];
+        cloud.draw(gc);
+      }
+
+      // Player
+      player.draw(gc);
+
+      // Gun
+      for (var i=0; i<shootingShots.length; i++) {
+        var shot = shootingShots[i];
+        shot.draw(gc);
+      }
+
+      // Shape
+      for (var i=0; i< runningShapes.length; i++) {
+        var shape = this.runningShapes[i];
+        shape.draw(gc);
+      }
+
+      // Score
+      drawScore(gc);
+
+      // Game over
+      if (player.life == 0) {
+          drawGameOver(gc);
+      }
+    }
+
+    function tick() {
+      if (gameStart) {
+        frame ++;
+
+        // Clouds
+        for (var i=0; i< clouds.length; i++) {
+          var cloud = this.clouds[i];
+          cloud.tick();
+        }
+
+        // Ground
+        ground.tick();
+
+        // Player
+        if (player.life > 0) {
+          player.tick();
+        } else if (player.life == 0) {
+          gameStart = false; // Game over
+        }
+
+        // Gun
+        let removedShots = [];
+        for (var i=0; i< shootingShots.length; i++) {
+          var shot = shootingShots[i];
+          shot.tick(gc);
+          if (shot.x > c.width) { // Remove shots if they disappear from the sight
+            removedShots.push(i);
+          }
+        }
+        removedShots.forEach(function (i) {
+          shootingShots.splice(i, 1);
+        });
+
+        // Shapes
+        let removedShapes = [];
+        for (var i=0; i< runningShapes.length; i++) {
+          var shape = this.runningShapes[i];
+          shape.tick();
+          if (shape.x < -40) { // Remove shapes if they disappear from the sight
+            removedShapes.push(i);
+          }
+        }
+        removedShapes.forEach(function (i) {
+          runningShapes.splice(i, 1);
+        });
+
+        removedShapes = [];
+        removedShots = [];
+        // Check collision
+        for (var i=0; i< runningShapes.length; i++) {
+          var shape = this.runningShapes[i];
+          // Player and shapes
+          if (shape.contains(player.frontX, player.middleY)) {
+            player.loseLife();
+            removedShapes.push(i);
+            console.log("Lose one life (now: )", player.life, ")");
+          }
+          // Shots and shapes
+          for (var n=0; n< shootingShots.length; n++) {
+            var shot = shootingShots[n];
+            if (shape.contains(shot.x, shot.y)) {
+              if (shape.type == shot.type) {
+                removedShots.push(n);
+                removedShapes.push(i);
+                console.log("Good job");
+              }
+            }
+          }
+        }
+        removedShapes.forEach(function (i) {
+          runningShapes.splice(i, 1);
+        });
+
+        removedShots.forEach(function (n) {
+          shootingShots.splice(n, 1);
+        });
+        setTimeout(tick, 100); // Tick every 100 msec
+      }
+      drawAll(); // Redraw all with updated data
+    }
+
+    function launchShape() {
+      // Containing all types of shapes
+      shapeType.push("circle", "rectangle", "triangle", "diamond", "pentagon", "hexagon", "parallelogram", "trapezoid");
+
+      // Get a random type of shape
+      var randomShape = shapeType[Math.floor(Math.random() * shapeType.length)];
+      var shp;
+
+      // Create the shape
+      if (randomShape == "circle") {
+        shp = new Circle();
+      } else if (randomShape == "rectangle") {
+        shp = new Rectangle();
+      } else if (randomShape == "triangle") {
+        shp = new Triangle();
+      } else if (randomShape == "diamond") {
+        shp = new Diamond();
+      } else if (randomShape == "pentagon") {
+        shp = new Pentagon();
+      } else if (randomShape == "hexagon") {
+        shp = new Hexagon();
+      } else if (randomShape == "parallelogram") {
+        shp = new Parallel();
+      } else if (randomShape == "trapezoid") {
+        shp = new Trapezoid();
+      }
+      runningShapes.push(shp); // Put the initialized item in the arrayList
+    }
+
+    // Shoot
+    function shootAShot(type) {
+      var sht;
+
+      if (type == "circle") {
+        sht = new Gun(player, "circle");
+      } else if (type == "rectangle") {
+        sht = new Gun(player, "rectangle");
+      } else if (type == "triangle") {
+        sht = new Gun(player, "triangle");
+      } else if (type == "square") {
+        sht = new Gun(player, "square");
+      } else if (type == "diamond") {
+        sht = new Gun(player, "diamond");
+      } else if (type == "parallelogram") {
+        sht = new Gun(player, "parallelogram");
+      } else if (type == "trapezoid") {
+        sht = new Gun(player, "trapezoid");
+      } else if (type == "pentagon") {
+        sht = new Gun(player, "pentagon");
+      } else if (type == "hexagon") {
+        sht = new Gun(player, "hexagon");
+      }
+      shootingShots.push(sht); // Put the initialized item in the arrayList
+      sht.setShooting(true); // Set isShot state as true
+    }
+
+  </script>
+
+  </head>
+
+  <body id="Body">
+    <div id="title">
+      <h1 style="font-family:helvetica; text-align:center;">Speak Go</h1>
+    </div>
+    <div id="istruction">
+      <!-- <h2 style="font-family:helvetica; text-align:center;"><span id="statusmsg">Press the start button to start</span></h2> -->
+      <p style="font-family:helvetica; text-align:center;"><b><span id="statusmsg">Press the start button to start</span></b></p>
+    </div>
+
+    <div id="buttonarea" style="text-align: center;">&nbsp;</div>
+    <canvas id="MyCanvas"></canvas>
+
+    <div id="div_language">
+      <select id="select_language" onchange="updateCountry()">
+        </select>&nbsp;&nbsp; <select id="select_dialect">
+        </select>
+    </div>
+
+
+
+
+  <!-- Web Speech -->
+  <script>
+  "use strict";
+
+  /*
+   * Based on https://www.google.com/intl/en/chrome/demos/speech.html
+   * Must run on a remote server, and access via https not http.
+   * Works on only Chrome
+   */
+
+  /*
+   * Choose your language
+   */
+  var langs =
+  [['Afrikaans',       ['af-ZA']],
+   ['አማርኛ',           ['am-ET']],
+   ['Azərbaycanca',    ['az-AZ']],
+   ['বাংলা',            ['bn-BD', 'বাংলাদেশ'],
+                       ['bn-IN', 'ভারত']],
+   ['Bahasa Indonesia',['id-ID']],
+   ['Bahasa Melayu',   ['ms-MY']],
+   ['Català',          ['ca-ES']],
+   ['Čeština',         ['cs-CZ']],
+   ['Dansk',           ['da-DK']],
+   ['Deutsch',         ['de-DE']],
+   ['English',         ['en-AU', 'Australia'],
+                       ['en-CA', 'Canada'],
+                       ['en-IN', 'India'],
+                       ['en-KE', 'Kenya'],
+                       ['en-TZ', 'Tanzania'],
+                       ['en-GH', 'Ghana'],
+                       ['en-NZ', 'New Zealand'],
+                       ['en-NG', 'Nigeria'],
+                       ['en-ZA', 'South Africa'],
+                       ['en-PH', 'Philippines'],
+                       ['en-GB', 'United Kingdom'],
+                       ['en-US', 'United States']],
+   ['Español',         ['es-AR', 'Argentina'],
+                       ['es-BO', 'Bolivia'],
+                       ['es-CL', 'Chile'],
+                       ['es-CO', 'Colombia'],
+                       ['es-CR', 'Costa Rica'],
+                       ['es-EC', 'Ecuador'],
+                       ['es-SV', 'El Salvador'],
+                       ['es-ES', 'España'],
+                       ['es-US', 'Estados Unidos'],
+                       ['es-GT', 'Guatemala'],
+                       ['es-HN', 'Honduras'],
+                       ['es-MX', 'México'],
+                       ['es-NI', 'Nicaragua'],
+                       ['es-PA', 'Panamá'],
+                       ['es-PY', 'Paraguay'],
+                       ['es-PE', 'Perú'],
+                       ['es-PR', 'Puerto Rico'],
+                       ['es-DO', 'República Dominicana'],
+                       ['es-UY', 'Uruguay'],
+                       ['es-VE', 'Venezuela']],
+   ['Euskara',         ['eu-ES']],
+   ['Filipino',        ['fil-PH']],
+   ['Français',        ['fr-FR']],
+   ['Basa Jawa',       ['jv-ID']],
+   ['Galego',          ['gl-ES']],
+   ['ગુજરાતી',           ['gu-IN']],
+   ['Hrvatski',        ['hr-HR']],
+   ['IsiZulu',         ['zu-ZA']],
+   ['Íslenska',        ['is-IS']],
+   ['Italiano',        ['it-IT', 'Italia'],
+                       ['it-CH', 'Svizzera']],
+   ['ಕನ್ನಡ',             ['kn-IN']],
+   ['ភាសាខ្មែរ',          ['km-KH']],
+   ['Latviešu',        ['lv-LV']],
+   ['Lietuvių',        ['lt-LT']],
+   ['മലയാളം',          ['ml-IN']],
+   ['मराठी',             ['mr-IN']],
+   ['Magyar',          ['hu-HU']],
+   ['ລາວ',              ['lo-LA']],
+   ['Nederlands',      ['nl-NL']],
+   ['नेपाली भाषा',        ['ne-NP']],
+   ['Norsk bokmål',    ['nb-NO']],
+   ['Polski',          ['pl-PL']],
+   ['Português',       ['pt-BR', 'Brasil'],
+                       ['pt-PT', 'Portugal']],
+   ['Română',          ['ro-RO']],
+   ['සිංහල',          ['si-LK']],
+   ['Slovenščina',     ['sl-SI']],
+   ['Basa Sunda',      ['su-ID']],
+   ['Slovenčina',      ['sk-SK']],
+   ['Suomi',           ['fi-FI']],
+   ['Svenska',         ['sv-SE']],
+   ['Kiswahili',       ['sw-TZ', 'Tanzania'],
+                       ['sw-KE', 'Kenya']],
+   ['ქართული',       ['ka-GE']],
+   ['Հայերեն',          ['hy-AM']],
+   ['தமிழ்',            ['ta-IN', 'இந்தியா'],
+                       ['ta-SG', 'சிங்கப்பூர்'],
+                       ['ta-LK', 'இலங்கை'],
+                       ['ta-MY', 'மலேசியா']],
+   ['తెలుగు',           ['te-IN']],
+   ['Tiếng Việt',      ['vi-VN']],
+   ['Türkçe',          ['tr-TR']],
+   ['اُردُو',            ['ur-PK', 'پاکستان'],
+                       ['ur-IN', 'بھارت']],
+   ['Ελληνικά',         ['el-GR']],
+   ['български',         ['bg-BG']],
+   ['Pусский',          ['ru-RU']],
+   ['Српски',           ['sr-RS']],
+   ['Українська',        ['uk-UA']],
+   ['한국어',            ['ko-KR']],
+   ['中文',             ['cmn-Hans-CN', '普通话 (中国大陆)'],
+                       ['cmn-Hans-HK', '普通话 (香港)'],
+                       ['cmn-Hant-TW', '中文 (台灣)'],
+                       ['yue-Hant-HK', '粵語 (香港)']],
+   ['日本語',           ['ja-JP']],
+   ['हिन्दी',             ['hi-IN']],
+   ['ภาษาไทย',         ['th-TH']]];
+
+  for (var i = 0; i < langs.length; i++) {
+    select_language.options[i] = new Option(langs[i][0], i);
+  }
+  select_language.selectedIndex = 10;
+  updateCountry();
+  select_dialect.selectedIndex = 11;
+
+  // Hide the language controls; default English
+  select_language.style.visibility = 'hidden';
+  select_dialect.style.visibility = 'hidden';
+
+  function updateCountry() {
+    for (var i = select_dialect.options.length - 1; i >= 0; i--) {
+      select_dialect.remove(i);
+    }
+    var list = langs[select_language.selectedIndex];
+    for (var i = 1; i < list.length; i++) {
+      select_dialect.options.add(new Option(list[i][1], list[i][0]));
+    }
+    select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
+  }
+
+  /*
+   * Set up recognizer
+   */
+  var final_transcript = '';
+  var recognizing = false;
+  var ignore_onend;
+  var start_timestamp;
+  if (!('webkitSpeechRecognition' in window)) {
+    upgrade();
+  } else {
+    var recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onstart = function() {
+      recognizing = true;
+    };
+
+    // Things that can go wrong
+    recognition.onerror = function(event) {
+      if (event.error == 'no-speech') {
+        ignore_onend = true;
+      }
+      if (event.error == 'audio-capture') {
+
+        ignore_onend = true;
+      }
+      if (event.error == 'not-allowed') {
+        if (event.timeStamp - start_timestamp < 200) {
+        } else {
+        }
+        ignore_onend = true;
+      }
+    };
+
+    recognition.onend = function() {
+      // never let it end
+      console.log("onstart & start called again 1")
+      recognition.onstart();
+      recognition.start();
+    };
+
+    recognition.onresult = function(event) {
+      var interim_transcript = '';
+      if (typeof(event.results) == 'undefined') {
+        recognition.onend = null;
+        recognition.stop();
+        upgrade();
+        return;
+      }
+      // event.results is an array of the recognized strings
+      for (var i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          final_transcript += event.results[i][0].transcript;
+        } else {
+          interim_transcript += event.results[i][0].transcript;
+        }
+        doit(interim_transcript);
+        interim_transcript = '';
+      }
+    };
+  }
+
+  // User message about browser
+  function upgrade() {
+  }
+
+  // Convert line breaks to HTML
+  var two_line = /\n\n/g;
+  var one_line = /\n/g;
+  function linebreak(s) {
+    return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+  }
+
+  function startButton() {
+  	console.log("startButton called")
+    // Stop
+    if (recognizing) {
+      recognition.stop();
+    }
+
+    // Start
+    else {
+      final_transcript = '';
+      recognition.lang = select_dialect.value;
+      recognition.start();
+      ignore_onend = false;
+      start_timestamp = event.timeStamp;
+    }
+  }
+
+  /*
+   ***************************************************************************
+   * Voice drawing program, just an example of usage of above code
+   ***************************************************************************
+   */
+  function doit (string) {
+    string = string.toLowerCase()
+
+    // Search for a shape, else we don't draw
+    var shape = shapeType.filter (
+      function (s) {
+        return string.match (new RegExp ("\\b" + s + "\\b"))
+      }) [0]
+
+    // If found a shape, draw it
+    if (shape) {
+      shootAShot(shape);
+    }
+  }
+  </script>
+
+  </body>
+</html>
