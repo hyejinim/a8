@@ -176,12 +176,6 @@
       // Player
       player.draw(gc);
 
-      // Game over
-      // if (player.width <= 10) {
-      if (player.life == 0) {
-        drawGameOver(gc);
-      }
-
       // Gun
       for (var i=0; i<shootingShots.length; i++) {
         var shot = shootingShots[i];
@@ -192,6 +186,11 @@
       for (var i=0; i< runningShapes.length; i++) {
         var shape = this.runningShapes[i];
         shape.draw(gc);
+      }
+
+      // Game over
+      if (player.life == 0) {
+        drawGameOver(gc);
       }
     }
 
