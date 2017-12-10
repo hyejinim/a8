@@ -1,7 +1,5 @@
 class Cloud {
   constructor() {
-    // this.emoji = '☁️';
-    // this.size = getRandomValue(40, 70);
     this.x = Math.random() * c.width;
     this.y = Math.random() * (c.height/3);
     this.image = new Image();
@@ -9,9 +7,6 @@ class Cloud {
 
   }
   draw(context) {
-    // context.font = (this.size) + "px Helvetica";
-    // context.fillText(this.emoji, this.x, this.y);
-
     // For initial drawing
     let x = this.x;
     let y = this.y;
