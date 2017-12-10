@@ -1,3 +1,6 @@
+// Hyejin Im, hyejin.im@tufts.edu
+// Kam Chan Kang, Kamchan.Kang@tufts.edu 
+
 class Cloud {
   constructor() {
     this.x = Math.random() * c.width;
