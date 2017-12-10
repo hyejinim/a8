@@ -1,3 +1,6 @@
+// Hyejin Im, hyejin.im@tufts.edu
+// Kam Chan Kang, Kamchan.Kang@tufts.edu 
+
 class Pentagon extends Shape {
   constructor() {
     super();
