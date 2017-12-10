@@ -1,19 +1,21 @@
 class Gun {
 
   constructor(player, type) {
-    this.type = type + " ▶";
-    this.size = 25;
-    this.x = player.x;
-    this.y = player.y + 100;
+    this.type = type;
+    this.text = type + " >>"; //▶
+    this.size = 30;
+    this.x = player.x + 200;
+    this.y = player.y + 120;
     this.shooting = false;
+    this.width = gc.measureText(type).width;
+    this.height = gc.measureText(type).height;
     // this.hit = false;
   }
   draw(context) {
     context.fillStyle = "#000000";
     context.font = (this.size) + "px Helvetica";
-    context.fillText(this.type, this.x, this.y);
-
-    console.log("shot draw");
+    context.textAlign="right";
+    context.fillText(this.text, this.x, this.y);
   }
   setPosition(x, y) {
     this.x = x;
@@ -28,7 +30,7 @@ class Gun {
     if (this.shooting) {
       // if (!this.hit) {
         this.x += 20;
-        console.log('shot tick')
+        // console.log('shot tick')
         // this.shot = false;
       }
       else {
