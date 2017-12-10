@@ -45,7 +45,9 @@ class Player {
     // this.height = this.height * 1/int;
   }
   loseLife(){
-    this.life = this.life -1;
+    if (this.life > 0) {
+      this.life = this.life -1;
+    }
     this.setScale(2);
     console.log("lose one life (now: ", this.life, ")");
   }
