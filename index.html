@@ -11,6 +11,7 @@
   <script src="Shape.js"></script>
   <script src="Circle.js"></script>
   <script src="Rectangle.js"></script>
+  <script src="Square.js"></script>
   <script src="Triangle.js"></script>
   <script src="Diamond.js"></script>
   <script src="Parallel.js"></script>
@@ -218,7 +219,7 @@
 
     function launchShape() {
       // Containing all types of shapes
-      shapeType.push("circle", "rectangle", "triangle", "diamond", "pentagon", "hexagon", "parallelogram", "trapezoid");
+      shapeType.push("circle", "rectangle", "square", "triangle", "diamond", "pentagon", "hexagon", "parallelogram", "trapezoid");
 
       // Get a random type of shape
       var randomShape = shapeType[Math.floor(Math.random() * shapeType.length)];
@@ -229,6 +230,8 @@
         shp = new Circle();
       } else if (randomShape == "rectangle") {
         shp = new Rectangle();
+      } else if (randomShape == "square") {
+        shp = new Square();
       } else if (randomShape == "triangle") {
         shp = new Triangle();
       } else if (randomShape == "diamond") {
