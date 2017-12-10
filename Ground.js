@@ -7,7 +7,7 @@ class Ground {
     this.y = c.height * 3.5/5;
     this.x2 = this.x + c.width;
     this.image = new Image();
-    this.image.src = 'images/ground.png';
+    this.image.src = 'ground.png';
   }
   draw(context) {
     let x = this.x;
