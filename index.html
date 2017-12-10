@@ -260,6 +260,7 @@
           // Player and shapes
           if (shape.contains(player.frontX, player.middleY)) {
             player.loseLife();
+            removed.push(i);
           }
           // Shots and shapes
           for (var n=0; n< shootingShots.length; n++) {
