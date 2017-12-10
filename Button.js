@@ -13,8 +13,8 @@ class Button {
   callback() {
     var label = this.button.value;
 
-    document.getElementById("statusmsg").innerHTML =
-      "'" + this.button.value + "'" + " button" + " was pushed";
+    // document.getElementById("statusmsg").innerHTML =
+    //   "'" + this.button.value + "'" + " button" + " was pushed";
 
     if (label == "Start") {
       gameStart = true;
@@ -22,10 +22,8 @@ class Button {
       tick();
       this.button.blur();
     } else if (label == "Stop") {
-      // player.bound();
       gameStart = false;
       clearInterval(this.shapeTimerID);
-      // setInterval(launchShape, 0);
     }
   }
 }
