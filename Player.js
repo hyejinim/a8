@@ -8,7 +8,7 @@ class Player {
     this.moved = false;
     this.jumped = false;
     this.image = new Image();
-    this.image.src = 'images/bean-run1.png';
+    this.image.src = 'bean-run1.png';
     this.width = 170;
     this.height = 220;
     this.frontX = this.x + this.width - 25;
@@ -23,7 +23,7 @@ class Player {
     let image = this.image;
 
     if (!gameStart) {
-      this.image.src = 'images/bean-run3.png';
+      this.image.src = 'bean-run3.png';
     }
     image.onload = function(){
       context.drawImage(image, x, y, width, height);
@@ -55,16 +55,16 @@ class Player {
   tick() {
     // Run
     if (!this.moved) {
-      this.image.src = 'images/bean-run3.png';
+      this.image.src = 'bean-run3.png';
       this.moved = true;
     } else if (this.moved) {
-      this.image.src = 'images/bean-run4.png';
+      this.image.src = 'bean-run4.png';
       this.moved = false;
     }
     // Jump
     if (this.jumped) {
       if (this.y = c.height * 2.5/5) {
-        this.image.src = 'images/bean-run4.png';
+        this.image.src = 'bean-run4.png';
         this.y = this.y - 300;
         this.middleY = this.y + (this.height/2);
       }
@@ -73,7 +73,7 @@ class Player {
       if (this.y < c.height * 2.5/5) {
         this.y = this.y + 10;
         this.middleY = this.y + (this.height/2);
-        this.image.src = 'images/bean-run4.png';
+        this.image.src = 'bean-run4.png';
       }
     }
   }
