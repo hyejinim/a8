@@ -13,6 +13,14 @@
   <script src="Player.js"></script>
   <script src="Gun.js"></script>
   <script src="Shape.js"></script>
+  <script src="Circle.js"></script>
+  <script src="Rectangle.js"></script>
+  <script src="Triangle.js"></script>
+  <script src="Rhombus.js"></script>
+  <script src="Parallel.js"></script>
+  <script src="Trapezoid.js"></script>
+  <script src="Pentagon.js"></script>
+  <script src="Hexagon.js"></script>
   <script src="Button.js"></script>
   <script src="utils.js"></script>
 
@@ -190,7 +198,7 @@
 
       // Game over
       if (player.life == 0) {
-        drawGameOver(gc);
+          drawGameOver(gc);
       }
     }
 
@@ -231,6 +239,7 @@
         // Shapes
         for (var i=0; i< runningShapes.length; i++) {
           var shape = this.runningShapes[i];
+          console.log(shape);
           shape.tick();
           if (shape.x < -40) { // Remove shapes if they disappear from the sight
             removedShapes.push(i);
@@ -278,7 +287,7 @@
 
     function launchShape() {
       // Containing all types of shapes
-      shapeType.push("circle", "rectangle"); //"square", "ellipse", "triangle"
+      shapeType.push("circle", "rectangle", "triangle", "rhombus", "pentagon", "hexagon", "parallel", "trapezoid"); //"square"
 
       // Get a random type of shape
       var randomShape = shapeType[Math.floor(Math.random() * shapeType.length)];
@@ -288,11 +297,23 @@
         shp = new Circle();
       } else if (randomShape == "rectangle") {
         shp = new Rectangle();
+      } else if (randomShape == "triangle") {
+        shp = new Triangle();
+      } else if (randomShape == "rhombus") {
+        shp = new Rhombus();
+      } else if (randomShape == "pentagon") {
+        shp = new Pentagon();
+      } else if (randomShape == "hexagon") {
+        shp = new Hexagon();
+      } else if (randomShape == "parallel") {
+        shp = new Parallel();
+      } else if (randomShape == "trapezoid") {
+        shp = new Trapezoid();
       }
       runningShapes.push(shp); // Put the initialized item in the arrayList
     }
 
-    // Shoot a gun
+    // Shoot
     function shootAShot(type) {
       var sht;
 
