@@ -9,12 +9,12 @@ class Rectangle extends Shape {
   draw(context) {
     context.fillStyle = this.color;
     context.beginPath();
-    context.fillRect(this.x, this.y, this.width, this.width);
+    context.fillRect(this.x, this.y, this.width, this.height);
 
     // the outline
     context.lineWidth = 5;
     context.strokeStyle = '#000000';
-    context.strokeRect(this.x, this.y, this.width, this.width);
+    context.strokeRect(this.x, this.y, this.width, this.height);
   }
   contains(px, py) {
     if ((this.x <= px && px <= this.x + this.width) && (this.y <= py && py <= this.y + this.height)) {
