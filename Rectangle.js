@@ -4,7 +4,7 @@ class Rectangle extends Shape {
     this.type = "rectangle";
     this.y = c.height * 3/5 + 15;
     this.width = this.size;
-    this.height = this.size + 40;
+    this.height = this.size * 1.2;
   }
   draw(context) {
     context.fillStyle = this.color;
