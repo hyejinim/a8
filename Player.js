@@ -1,3 +1,6 @@
+// Hyejin Im, hyejin.im@tufts.edu
+// Kam Chan Kang, Kamchan.Kang@tufts.edu
+
 class Player {
   constructor() {
     this.x = 80; //c.width * 1/10;
