@@ -7,7 +7,6 @@ class Pentagon extends Shape {
     this.height = this.size;
   }
   draw(context) {
-    // super.draw();
     context.fillStyle = this.color;
     context.beginPath();
     context.moveTo(this.x + this.width/2, this.y);
@@ -22,9 +21,7 @@ class Pentagon extends Shape {
     this.drawOutliine(context);
   }
   contains(px, py) {
-    // console.log("rectan contains")
     if ((this.x <= px && px <= this.x + this.width) && (this.y <= py && py <= this.y + this.height)) {
-      console.log("-----------------------Rect");
       return true;
     }
     return false;
