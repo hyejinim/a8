@@ -1,116 +1,340 @@
-class Shape {
-  constructor(type) {
-    this.type = type;
-    this.size = getRandomValue(70, 150); // radious for circle, width/height for rect
-    // this.width = getRandomValue(70, 150);
-    // this.height = getRandomValue(70, 150);
-    this.speed = this.size / 20;
-    this.x = c.width + 50;
-    this.y = c.height * 3/5;
-    this.color = getRandomColor();
-    // console.log("make shape " + runningShapes.length);
-  }
-  setPosition(x, y) {
-    this.x = x;
-    this.y = y;
-  }
-  setSize(x) {
-    this.size = x;
-  }
-  tick() {
-    this.x -= 20;
-  }
-}
+<!DOCTYPE html>
 
-class Circle extends Shape {
-  constructor() {
-    super();
-    this.type = "circle";
-    // this.x = c.width + 50;
-    this.y = c.height * 3/5 + 50; // Adjust circle's y position
-    this.r = this.size/2;
-    // this.w = getRandomValue(10, 20);
-    // console.log("make circle " + runningShapes.length);
-  }
-  draw(context) {
-    gc.fillStyle = this.color;
-    context.beginPath();
-    context.arc (this.x, this.y, this.r, 0, Math.PI * 2);
-    context.fill();
-    // console.log("draw circle " + runningShapes.length);
+<html>
 
-  }
-  contains(px, py) {
-    if (Math.sqrt((px-this.x)*(px-this.x) + (py-this.y)*(py-this.y)) < this.r) {
-      console.log("-----------------------Circle");
-      return true;
+<head>
+  <title>Assignment 8</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="Ground.js"></script>
+  <script src="Cloud.js"></script>
+  <script src="Player.js"></script>
+  <script src="Gun.js"></script>
+  <script src="Shape.js"></script>
+  <script src="Button.js"></script>
+  <script src="utils.js"></script>
+
+  <script type="text/javascript">
+
+    // Globals variables
+    var c, gc;
+    var frame = 0;
+    var shapeType = [];
+    var waitingShapes = [];
+    var runningShapes = [];
+    var player;
+    // var gun;
+    var ground;
+    // var hit;
+    var shootingShots = [];
+    var clouds = [];
+    var gameStart;
+
+    // Shape colors
+    var colors = ['#FFFF8D',
+    							'#dff69e',
+              		'#00ceff',
+    							'#ee78aa',
+              		'#3f159f',
+              		'#71b583',
+              		'#00a2ff'];
+
+    <!-- onload Function -->
+    window.onkeydown = function(e) {
+      if (e.keyCode == 32 || e.keyCode == 38 && e.target == document.body) {
+        e.preventDefault();
+        player.setJumped(true);
+      }
+      else if (e.keyCode == 39 || e.keyCode == 65 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "circle"; // test input
+        console.log("pressed arrow key")
+        shootAShot(type);
+        // console.log('Shoot a shot');
+      }
+      else if (e.keyCode == 83 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "rectangle"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 68 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "triangle"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 70 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "square"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 70 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "rhombus"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 81 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "parallelogram"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 87 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "parallelogram"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 69 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "pentagon"; // test input
+        shootAShot(type);
+      }
+      else if (e.keyCode == 82 && e.target == document.body) {
+        e.preventDefault();
+
+        let type = "hexagon"; // test input
+        shootAShot(type);
+      }
     }
-    return false;
-  }
 
-}
+    window.onload = function() {
+      // Set up canvas
+      c = document.getElementById("MyCanvas");
+      gc = c.getContext("2d");
+      c.width = window.innerWidth;
+      c.height = window.innerHeight-100;
 
-class Rectangle extends Shape {
-  constructor() {
-    super();
-    this.type = "rectangle";
-    this.y = c.height * 3/5 + 15;
-    this.width = this.size; // for bounding box
-    this.height = this.size; // for bounding box
-    // this.width = getRandomValue(100, 200);
-    // this.height = getRandomValue(100, 200);
-    // console.log("make rect " + runningShapes.length);
-  }
-  draw(context) {
-    gc.fillStyle = this.color;
-    context.beginPath();
-    context.fillRect(this.x, this.y, this.size, this.size);
-    // console.log("draw rect " + runningShapes.length);
-  }
-  contains(px, py) {
-    // console.log("rectan contains")
-    if ((this.x <= px && px <= this.x + this.width) && (this.y <= py && py <= this.y + this.height)) {
-      console.log("-----------------------Rect");
-      return true;
+      gameStart = false;
+
+      // Create player
+      player = new Player();
+
+      // Create background stuff
+      for (var i=0; i<5; i++) {
+        var cloud = new Cloud();
+        clouds.push(cloud);
+      }
+      ground = new Ground();
+
+      // Draw everything
+      drawAll();
+
+      // Add buttons
+      new Button("Start");
+      new Button("Stop");
+
+      console.log("onload")
     }
-    return false;
-  }
-}
 
-class Triangle extends Shape {
-  constructor() {
-    super();
-    this.type = "triangle";
-    this.y = c.height * 3/5 + 15;
-    this.width = this.size; // for bounding box
-    this.height = this.size; // for bounding box
-    // this.width = getRandomValue(100, 200);
-    // this.height = getRandomValue(100, 200);
-    // console.log("make rect " + runningShapes.length);
-  }
-  draw(context) {
-    gc.fillStyle = this.color;
-    // context.beginPath();
-    // context.fillRect(this.x, this.y, this.size, this.size);
-
-    context.beginPath();
-    context.moveTo(100, 100);
-    context.lineTo(100, 300);
-    context.lineTo(300, 300);
-    context.closePath();
-
-    // the outline
-    context.lineWidth = 10;
-    context.strokeStyle = '#666666';
-    context.stroke();
-
-    context.fill();
-  }
-  contains(px, py) {
-    if ((this.x <= px && px <= this.x + this.width) && (this.y <= py && py <= this.y + this.height)) {
-      console.log("-----------------------Triangle");
-      return true;
+    <!-- Function -->
+    function drawBackground() {
+      var grd=gc.createLinearGradient(0,75,0,750); // gradiation color
+      // grd.addColorStop(0,"#FFAFBD");
+      // grd.addColorStop(1,"#ffc3a0");
+      gc.fillStyle = "#EEEEEE"; //EEEEEE #43C6AC #FFAFBD ffc3a0 #d3d3d3 #FFEB3B grd
+      gc.fillRect(0, 0, c.width, c.height);
     }
-    return false;
-  }
-}
+
+    function drawGameOver(context) {
+      context.fillStyle = "#000000";
+      context.font = 50 + "px Helvetica";
+      context.textAlign="center";
+      context.fillText("G A M E  O V E R", c.width/2, c.height/2);
+    }
+
+    function drawScore(context) {
+      context.fillStyle = "#000000";
+      context.font = 50 + "px Helvetica";
+      context.textAlign="center";
+      context.fillText(frame, c.width/2, c.height * 1/7);
+    }
+
+    function drawAll() {
+      gc.clearRect(0, 0, c.width, c.height);
+      // Background
+      drawBackground();
+      drawScore(gc);
+
+      // Ground
+      ground.draw(gc);
+
+      // Clouds
+      for (var i=0; i<clouds.length; i++) {
+        var cloud = this.clouds[i];
+        cloud.draw(gc);
+        // console.log("draw cloud");
+      }
+
+      // Player
+      player.draw(gc);
+
+      // Game over
+      // if (player.width <= 10) {
+      if (player.life == 0) {
+        drawGameOver(gc);
+      }
+
+      // Gun
+      for (var i=0; i<shootingShots.length; i++) {
+        var shot = shootingShots[i];
+        shot.draw(gc);
+      }
+
+      // Shape
+      for (var i=0; i< runningShapes.length; i++) {
+        var shape = this.runningShapes[i];
+        shape.draw(gc);
+      }
+    }
+
+    function tick() {
+      if (gameStart) {
+        frame ++;
+
+        // Clouds
+        for (var i=0; i< clouds.length; i++) {
+          var cloud = this.clouds[i];
+          cloud.tick();
+        }
+
+        // Ground
+        ground.tick();
+
+        // Player
+        if (player.life > 0) {
+          player.tick();
+        } else if (player.life == 0) {
+          gameStart = false; // Game over
+        }
+
+        // Gun
+        let removedShapes = [];
+        let removedShots = [];
+        for (var i=0; i< shootingShots.length; i++) {
+          var shot = shootingShots[i];
+          shot.tick(gc);
+          if (shot.x > c.width) { // Remove shots if they disappear from the sight
+            removedShapes.push(i);
+          }
+        }
+        removedShapes.forEach(function (i) {
+          shootingShots.splice(i, 1);
+        });
+
+        // Shapes
+        for (var i=0; i< runningShapes.length; i++) {
+          var shape = this.runningShapes[i];
+          shape.tick();
+          if (shape.x < -40) { // Remove shapes if they disappear from the sight
+            removedShapes.push(i);
+          }
+        }
+        removedShapes.forEach(function (i) {
+          runningShapes.splice(i, 1);
+          removedShapes = [];
+        });
+
+        // Check collision
+        for (var i=0; i< runningShapes.length; i++) {
+          var shape = this.runningShapes[i];
+          // Player and shapes
+          if (shape.contains(player.frontX, player.middleY)) {
+            player.loseLife();
+          }
+          // Shots and shapes
+          for (var n=0; n< shootingShots.length; n++) {
+            var shot = shootingShots[n];
+            if (shape.contains(shot.x, shot.y)) {
+              // console.log("shot ", shot.type, " ", "shape ", shape.type);
+              if (shape.type == shot.type) {
+                removedShots.push(n);
+                removedShapes.push(i);
+                console.log("Good job");
+              }
+            }
+          }
+        }
+        removedShapes.forEach(function (i) {
+          runningShapes.splice(i, 1);
+          removedShapes = [];
+          console.log("Removed shape")
+        });
+        removedShots.forEach(function (n) {
+          shootingShots.splice(n, 1);
+          removedShots = [];
+          console.log("Removed shot")
+        });
+        setTimeout(tick, 100); // Tick every 100 msec
+      }
+      drawAll(); // Redraw all with updated data
+    }
+
+    function launchShape() {
+      // Containing all types of shapes
+      shapeType.push("circle", "rectangle"); //"square", "ellipse", "triangle"
+
+      // Get a random type of shape
+      var randomShape = shapeType[Math.floor(Math.random() * shapeType.length)];
+      var shp;
+
+      if (randomShape == "circle") {
+        shp = new Circle();
+      } else if (randomShape == "rectangle") {
+        shp = new Rectangle();
+      }
+      runningShapes.push(shp); // Put the initialized item in the arrayList
+    }
+
+    // Shoot a gun
+    function shootAShot(type) {
+      var sht;
+
+      if (type == "circle") {
+        sht = new Gun(player, "circle");
+      } else if (type == "rectangle") {
+        sht = new Gun(player, "rectangle");
+      } else if (type == "triangle") {
+        sht = new Gun(player, "triangle");
+      } else if (type == "square") {
+        sht = new Gun(player, "square");
+      } else if (type == "rhombus") {
+        sht = new Gun(player, "rhombus");
+      } else if (type == "parallelogram") {
+        sht = new Gun(player, "parallelogram");
+      } else if (type == "pentagon") {
+        sht = new Gun(player, "pentagon");
+      } else if (type == "hexagon") {
+        sht = new Gun(player, "hexagon");
+      }
+      shootingShots.push(sht); // Put the initialized item in the arrayList
+      sht.setShooting(true); // Set isShot state as true
+    }
+
+
+
+  </script>
+
+</head>
+
+<body>
+  <div id="title">
+    <h1>Assignment 8</h1>
+  </div>
+  <canvas id="MyCanvas" ></canvas>
+  <div id="buttonarea">
+    &nbsp;
+  </div>
+  <p><b>Status: </b></b><span id="statusmsg">(Nothing Here)</span></p>
+  <!-- <p><b>Animal Count: </b></b><span id="count">0</span></p>
+  <p><b>Selected Animal: </b></b><span id="selected" style="font-size:60px;"></span></p> -->
+</body>
+
+</html>
