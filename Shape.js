@@ -1,7 +1,7 @@
 class Shape {
   constructor(type) {
     this.type = type;
-    this.size = getRandomValue(70, 150); // radious for circle, width/height for rect
+    this.size = getRandomValue(70, 150);
     this.speed = this.size / 20;
     this.x = c.width + 50;
     this.y = c.height * 3/5;
