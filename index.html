@@ -25,7 +25,7 @@
 
     // Globals variables
     var c, gc;
-    var frame = 0;
+    var frame;
     var shapeType = [];
     var waitingShapes = [];
     var runningShapes = [];
@@ -51,18 +51,17 @@
 
       init();
 
-      // Draw everything
-      drawAll();
-
       // Add buttons
       new Button("Start");
       new Button("Stop");
+      new Button("Restart");
 
       console.log("onload")
     }
 
     <!-- Function -->
     function init() {
+      frame = 0;
       gameStart = false;
 
       // Create player
@@ -74,6 +73,9 @@
         clouds.push(cloud);
       }
       ground = new Ground();
+
+      // Draw everything
+      drawAll();
     }
 
     function drawBackground() {
