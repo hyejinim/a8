@@ -3,8 +3,8 @@ class Rectangle extends Shape {
     super();
     this.type = "rectangle";
     this.y = c.height * 3/5 + 15;
-    this.width = getRandomValue(70, 150);
-    this.height = getRandomValue(70, 150);
+    this.width = this.size;
+    this.height = this.size + 40;
   }
   draw(context) {
     context.fillStyle = this.color;
