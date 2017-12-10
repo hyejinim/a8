@@ -1,3 +1,6 @@
+// Hyejin Im, hyejin.im@tufts.edu
+// Kam Chan Kang, Kamchan.Kang@tufts.edu 
+
 class Gun {
   constructor(player, type) {
     this.type = type;
