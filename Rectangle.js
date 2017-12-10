@@ -3,18 +3,18 @@ class Rectangle extends Shape {
     super();
     this.type = "rectangle";
     this.y = c.height * 3/5 + 15;
-    this.width = this.size;
-    this.height = this.size;
+    this.width = getRandomValue(70, 150);
+    this.height = getRandomValue(70, 150);
   }
   draw(context) {
     context.fillStyle = this.color;
     context.beginPath();
-    context.fillRect(this.x, this.y, this.size, this.size);
+    context.fillRect(this.x, this.y, this.width, this.width);
 
     // the outline
     context.lineWidth = 5;
     context.strokeStyle = '#000000';
-    context.strokeRect(this.x, this.y, this.size, this.size);
+    context.strokeRect(this.x, this.y, this.width, this.width);
   }
   contains(px, py) {
     if ((this.x <= px && px <= this.x + this.width) && (this.y <= py && py <= this.y + this.height)) {
