@@ -1,5 +1,4 @@
 class Player {
-
   constructor() {
     this.x = c.width * 1/7;
     this.y = c.height * 2.7/5;
@@ -42,7 +41,6 @@ class Player {
   setScale(int){
     this.width = this.width * 1/int;
     this.frontX = this.x + this.width;
-    // this.height = this.height * 1/int;
   }
   loseLife(){
     if (this.life > 0) {
@@ -52,6 +50,7 @@ class Player {
     console.log("lose one life (now: ", this.life, ")");
   }
   tick() {
+    // Run
     if (!this.moved) {
       this.image.src = 'images/bean-run3.png';
       this.moved = true;
@@ -59,8 +58,8 @@ class Player {
       this.image.src = 'images/bean-run4.png';
       this.moved = false;
     }
+    // Jump
     if (this.jumped) {
-      // Jumping animation
       if (this.y = c.height * 2.5/5) {
         this.image.src = 'images/bean-run4.png';
         this.y = this.y - 300;
