@@ -1,3 +1,6 @@
+// Hyejin Im, hyejin.im@tufts.edu
+// Kam Chan Kang, Kamchan.Kang@tufts.edu 
+
 class Diamond extends Shape {
   constructor() {
     super();
@@ -21,7 +24,7 @@ class Diamond extends Shape {
   }
   contains(px, py) {
     if ((this.x <= px && px <= this.x + this.width) && (this.y <= py && py <= this.y + this.height)) {
-      console.log("-----------------------Rect");
+      console.log("collided with Diamond");
       return true;
     }
     return false;
