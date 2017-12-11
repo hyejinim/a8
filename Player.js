@@ -63,14 +63,14 @@ class Player {
     }
     // Jump
     if (this.jumped) {
-      if (this.y = c.height * 2.5/5) {
+      if (this.y = c.height * 2.7/5) {
         this.image.src = 'bean-run4.png';
         this.y = this.y - 300;
         this.middleY = this.y + (this.height/2);
       }
       this.jumped = false;
     } else {
-      if (this.y < c.height * 2.5/5) {
+      if (this.y < c.height * 2.7/5) {
         this.y = this.y + 10;
         this.middleY = this.y + (this.height/2);
         this.image.src = 'bean-run4.png';
