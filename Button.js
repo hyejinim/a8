@@ -24,7 +24,7 @@ class Button {
     var label = this.button.value;
 
     document.getElementById("statusmsg").innerHTML =
-      "Speak the shape name!";
+      "Speak the shape name to shoot a shot & press the space bar to jump!";
 
     if (label == "Start") {
       gameStart = true;
