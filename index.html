@@ -27,11 +27,11 @@
     var c, gc;
     var frame;
     var shapeType = [];
-    var waitingShapes = [];
-    var runningShapes = [];
+    var waitingShapes;
+    var runningShapes;
     var player;
     var ground;
-    var shootingShots = [];
+    var shootingShots;
     var clouds = [];
     var gameStart;
 
@@ -63,6 +63,11 @@
     function init() {
       frame = 0;
       gameStart = false;
+      
+      // Clear arrays
+      waitingShapes = [];
+      runningShapes = [];
+      shootingShots = [];
 
       // Create player
       player = new Player();
