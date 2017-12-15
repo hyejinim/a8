@@ -1,7 +1,9 @@
 # a8
-COMP86 Assignment 8
-Written By: Hye Jin Lim, Kam Chan Kang
-UTLN: him01, kkang02
+Written By: Hye Jin Im, Kam Chan Kang
+
+How to run:
+Browser - Chrome
+Run this program on a remote server, and accessed via https (not http)
 
 Project Overview:
 
