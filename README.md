@@ -1,4 +1,4 @@
-# a8
+# Speak Go
 Written By: Hye Jin Im, Kam Chan Kang
 
 How to run:
