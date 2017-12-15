@@ -2,11 +2,10 @@
 Written By: Hye Jin Im, Kam Chan Kang
 
 How to run:
-Browser - Chrome
 Run this program on a remote server, and accessed via https (not http)
+Works on Chrome, but not on Safari.
 
 Project Overview:
-
 Our project is a web application written in Javascript.
 It is a game with a voice controlled interface.
 We implemented Web Speech API (or the the Speech Recognition API to be exact).
