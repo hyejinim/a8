@@ -1,5 +1,5 @@
 # Speak Go
-Written By: Hye Jin Im, Kam Chan Kang
+Written By: Hyejin Im, Kam Chan Kang
 
 How to run:
 Run this program on a remote server, and accessed via https (not http)
